@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,13 +20,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.openclassrooms.eventorias.R
-import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
+import com.openclassrooms.eventorias.screen.component.WhiteButton
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAccountWithMailScreen(modifier: Modifier = Modifier, onLogin: () -> Unit) {
+fun LoginMailSelectorScreen(
+    modifier: Modifier = Modifier,
+    onCreateAccountClick: () -> Unit,
+    onLogInClick: () -> Unit
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -36,45 +41,42 @@ fun CreateAccountWithMailScreen(modifier: Modifier = Modifier, onLogin: () -> Un
             )
         }
     ) { innerPadding ->
-        CreateAccountWithMail(modifier = Modifier.padding(innerPadding), onLogin)
+        LoginMailSelector(
+            modifier = Modifier.padding(innerPadding),
+            onCreateAccountClick = onCreateAccountClick,
+            onLogInClick = onLogInClick
+        )
 
     }
 }
 
 @Composable
-fun CreateAccountWithMail(modifier: Modifier = Modifier, onLogin: () -> Unit) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        CustomTextField(
-            value = "",
-            onValueChange = {},
-            label = "E-mail",
-            modifier = Modifier.fillMaxWidth()
-        )
-        CustomTextField(
-            value = "",
-            onValueChange = {},
-            label = stringResource(R.string.first_and_last_name),
-            modifier = Modifier.fillMaxWidth()
-        )
+fun LoginMailSelector(
+    modifier: Modifier = Modifier,
+    onCreateAccountClick: () -> Unit,
+    onLogInClick: () -> Unit
+) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
 
-        CustomTextField(
-            value = "",
-            onValueChange = {},
-            label = stringResource(R.string.password),
-            modifier = Modifier.fillMaxWidth()
-        )
-        RedButton(
-            text = stringResource(R.string.create_account),
-            onClick = { /*TODO*/ },
-            modifier = Modifier.align(Alignment.End)
-        )
+        Column(
+            modifier
+                .width(242.dp)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            WhiteButton(
+                text = stringResource(R.string.already_have_an_account),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onLogInClick() }
+            )
 
+            RedButton(
+                text = stringResource(R.string.not_account),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onCreateAccountClick() }
+            )
+        }
     }
     Box(
         modifier = modifier.fillMaxSize(),
@@ -90,8 +92,11 @@ fun CreateAccountWithMail(modifier: Modifier = Modifier, onLogin: () -> Unit) {
 
 @Preview
 @Composable
-fun PreviewCreateAccountWithMail() {
+fun PreviewLogInWithMail() {
     EventoriasTheme {
-        CreateAccountWithMail(onLogin = {  })
+        LoginMailSelector(
+            onCreateAccountClick = {},
+            onLogInClick = {}
+        )
     }
 }

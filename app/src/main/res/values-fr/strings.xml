@@ -4,4 +4,14 @@
     <string name="google_sign_in">Se connecter avec Google</string>
     <string name="email_sign_in">Se connecter avec une adresse email</string>
     <string name="log_In">Se connecter</string>
+    <string name="password">Mot de passe</string>
+    <string name="log_in_with_password">E-mail reconnu ! Veuillez entrer votre mot de passe.</string>
+    <string name="first_and_last_name">Prénom et nom</string>
+    <string name="recover_account">Un e-mail de récupération de compte sera envoyé à l\'adresse suivante.</string>
+    <string name="cant_log_in">Vous ne parvenez pas à vous connecter</string>
+    <string name="send">Envoyer</string>
+    <string name="create_account">Créer un compte</string>
+    <string name="already_have_an_account">Déjà un compte ? Se Connecter</string>
+    <string name="not_account">Pas de compte ? Creer un compte</string>
+    <string name="logged_in">Connecté avec succes !</string>
 </resources>

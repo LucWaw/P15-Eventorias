@@ -23,21 +23,21 @@ import com.openclassrooms.eventorias.screen.component.ButtonWithGoogleIcon
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 
 @Composable
-fun LogInProvidersScreen(modifier: Modifier = Modifier) {
+fun LoginProvidersScreen(modifier: Modifier = Modifier, onMailClick :()-> Unit) {
 
     Scaffold(modifier = modifier) { innerPadding ->
-        LogInProviders(modifier = Modifier.padding(innerPadding))
+        LoginProviders(modifier = Modifier.padding(innerPadding), onMailClick)
     }
 
 }
 
 @Composable
-fun LogInProviders(modifier: Modifier = Modifier) {
+fun LoginProviders(modifier: Modifier = Modifier, onMailClick: () -> Unit) {
     Box (modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = modifier.width(242.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_eventorias),
@@ -51,7 +51,7 @@ fun LogInProviders(modifier: Modifier = Modifier) {
             )
             ButtonWithEmailIcon(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { /*TODO*/ }
+                onClick = { onMailClick() }
             )
         }
     }
@@ -62,6 +62,6 @@ fun LogInProviders(modifier: Modifier = Modifier) {
 @Composable
 fun LogInProvidersPreview() {
     EventoriasTheme {
-        LogInProviders()
+        LoginProviders(onMailClick = { })
     }
 }

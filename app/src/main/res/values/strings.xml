@@ -3,4 +3,14 @@
     <string name="google_sign_in">Sign in with Google</string>
     <string name="email_sign_in">Sign in with email</string>
     <string name="log_In">Log in</string>
+    <string name="password">Password</string>
+    <string name="log_in_with_password">E-mail recognized! Please enter your password.</string>
+    <string name="first_and_last_name">First and last name</string>
+    <string name="recover_account">An account recovery e-mail will be sent to the following address.</string>
+    <string name="cant_log_in">You are unable to connect</string>
+    <string name="send">Send</string>
+    <string name="create_account">Create an account</string>
+    <string name="already_have_an_account">Already have an account? Login</string>
+    <string name="not_account">No account yet? Create an account</string>
+    <string name="logged_in">Logged in successfully!</string>
 </resources>
