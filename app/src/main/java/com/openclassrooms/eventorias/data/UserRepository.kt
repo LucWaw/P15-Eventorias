@@ -20,7 +20,7 @@ class UserRepository {
         return FirebaseAuth.getInstance().currentUser
     }
 
-    fun loginWithPassword(email: String, password: String, name: String = ""): Task<AuthResult> {
+    fun loginWithPassword(email: String, password: String): Task<AuthResult> {
         return FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
     }
 

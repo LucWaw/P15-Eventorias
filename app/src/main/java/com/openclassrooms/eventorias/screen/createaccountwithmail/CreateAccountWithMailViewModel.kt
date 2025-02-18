@@ -24,9 +24,7 @@ class CreateAccountWithMailViewModel(
      */
     private var _user = MutableStateFlow(
         UserVerfication(
-            name = "",
-            email = "",
-            password = ""
+            name = "", email = "", password = ""
         )
     )
 
@@ -40,8 +38,7 @@ class CreateAccountWithMailViewModel(
     /**
      * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
      */
-    val error = user
-        .map {
+    val error = user.map {
             verifyPost()
         }.stateIn(
             scope = viewModelScope,
@@ -86,7 +83,5 @@ class CreateAccountWithMailViewModel(
 }
 
 data class UserVerfication(
-    val name: String,
-    val email: String,
-    val password: String
+    val name: String, val email: String, val password: String
 )

@@ -5,7 +5,7 @@
     <string name="email_sign_in">Se connecter avec une adresse email</string>
     <string name="log_In">Se connecter</string>
     <string name="password">Mot de passe</string>
-    <string name="log_in_with_password">E-mail reconnu ! Veuillez entrer votre mot de passe.</string>
+    <string name="log_in_with_password">Veuillez entrer votre mot de passe.</string>
     <string name="first_and_last_name">Prénom et nom</string>
     <string name="recover_account">Un e-mail de récupération de compte sera envoyé à l\'adresse suivante.</string>
     <string name="cant_log_in">Vous ne parvenez pas à vous connecter</string>
@@ -18,4 +18,6 @@
     <string name="error_email">E-mail invalide.</string>
     <string name="error_password">Le mot de passe doit comporter un minimum de 6 caractere.</string>
     <string name="error_name">Veuillez indiquer un prénom et un nom.</string>
+    <string name="send_mail_error">Erreur d\'envoi du mail</string>
+    <string name="popup_message_recovery_account">Suivez les instructions envoyées à l\'adresse %$1s pour récuperer votre mot de passe</string>
 </resources>

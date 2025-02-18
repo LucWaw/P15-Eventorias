@@ -4,7 +4,7 @@
     <string name="email_sign_in">Sign in with email</string>
     <string name="log_In">Log in</string>
     <string name="password">Password</string>
-    <string name="log_in_with_password">E-mail recognized! Please enter your password.</string>
+    <string name="log_in_with_password">Please enter your password.</string>
     <string name="first_and_last_name">First and last name</string>
     <string name="recover_account">An account recovery e-mail will be sent to the following address.</string>
     <string name="cant_log_in">You are unable to connect</string>
@@ -17,4 +17,6 @@
     <string name="error_email">Invalid E-mail.</string>
     <string name="error_password">The password must be at least 6 characters long.</string>
     <string name="error_name">Please provide a first and last name.</string>
+    <string name="send_mail_error">Error when sending mail</string>
+    <string name="popup_message_recovery_account">Follow the instructions sent to address %$1s to recover your password.</string>
 </resources>

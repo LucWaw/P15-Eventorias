@@ -14,12 +14,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.AuthResult
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
@@ -46,7 +53,7 @@ fun LoginWithPasswordScreen(
             )
         }
     ) { innerPadding ->
-        LoginWithPassword(modifier = Modifier.padding(innerPadding), onLogin, onRecoverClick)
+        LoginWithPassword(modifier = Modifier.padding(innerPadding), onLogin, onRecoverClick, onError, viewModel::login)
 
     }
 }
@@ -55,7 +62,9 @@ fun LoginWithPasswordScreen(
 fun LoginWithPassword(
     modifier: Modifier = Modifier,
     onLogInClick: () -> Unit,
-    onRecoverClick: () -> Unit
+    onRecoverClick: () -> Unit,
+    onError: () -> Unit,
+    login: (String, String) -> Task<AuthResult>
 ) {
     Column(
         modifier
@@ -64,6 +73,8 @@ fun LoginWithPassword(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        var emailLocal by remember { mutableStateOf("") }
+        var passwordLocal by remember { mutableStateOf("") }
 
         Text(
             text = stringResource(R.string.log_in_with_password),
@@ -71,15 +82,15 @@ fun LoginWithPassword(
         )
 
         CustomTextField(
-            value = "",
-            onValueChange = {},
+            value = emailLocal,
+            onValueChange = { emailLocal = it },
             label = "E-mail",
             modifier = Modifier.fillMaxWidth()
         )
 
         CustomTextField(
-            value = "",
-            onValueChange = {},
+            value = passwordLocal,
+            onValueChange = { passwordLocal = it },
             label = stringResource(R.string.password),
             modifier = Modifier.fillMaxWidth()
         )
@@ -92,7 +103,11 @@ fun LoginWithPassword(
 
             RedButton(
                 text = stringResource(R.string.log_In),
-                onClick = { /*TODO*/ },//if (viewmodel.login) onLogInClick() else Toast
+                onClick = { login(emailLocal, passwordLocal).addOnSuccessListener {
+                    onLogInClick()
+                }.addOnFailureListener {
+                    onError()
+                } },
             )
 
         }
@@ -117,6 +132,11 @@ fun LoginWithPassword(
 @Composable
 fun PreviewLogInWithPassword() {
     EventoriasTheme {
-        LoginWithPassword(onLogInClick = {  }, onRecoverClick = {  })
+        LoginWithPassword(
+            onLogInClick = { },
+            onRecoverClick = { },
+            onError = { },
+            login = { _, _ -> Tasks.forResult(null) }
+        )
     }
 }

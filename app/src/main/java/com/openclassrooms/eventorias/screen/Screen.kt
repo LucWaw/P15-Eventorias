@@ -18,7 +18,7 @@ sealed class Screen(
 
     data object LogInWithPassword : Screen("logInWithPassword")
 
-    data object CreateAccountWithMail : Screen("createAccountWithMail", navArguments = listOf(navArgument("mail") { type = NavType.StringType }))
+    data object CreateAccountWithMail : Screen("createAccountWithMail")
 
     data object RecoverAccountWithMail : Screen("recoverAccountWithMail", navArguments = listOf(navArgument("mail") { type = NavType.StringType }))
 
