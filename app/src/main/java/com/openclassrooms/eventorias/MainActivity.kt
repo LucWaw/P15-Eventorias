@@ -5,17 +5,19 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
-import com.openclassrooms.eventorias.screen.LoginProvidersScreen
 import com.openclassrooms.eventorias.screen.Screen
+import com.openclassrooms.eventorias.screen.component.RedButton
 import com.openclassrooms.eventorias.screen.createaccountwithmail.CreateAccountWithMailScreen
+import com.openclassrooms.eventorias.screen.loginproviders.LoginProvidersScreen
 import com.openclassrooms.eventorias.screen.loginwithpassword.LoginWithPasswordScreen
 import com.openclassrooms.eventorias.screen.recoveraccountwithmail.RecoverAccountWithMailScreen
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
@@ -65,12 +67,6 @@ class MainActivity : ComponentActivity() {
                         ).show()
                         },
                         onRecoverClick = { navHostController.navigate("${Screen.RecoverAccountWithMail.route}/${it}") },
-                        onError = {
-                            navHostController.navigate(Screen.LogInProviders.route);Toast.makeText(
-                            this@MainActivity,
-                            getString(R.string.connetion_error), Toast.LENGTH_SHORT
-                        ).show()
-                        }
                     )
                 }
                 composable(Screen.CreateAccountWithMail.route) {
@@ -106,7 +102,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable(Screen.Home.route) {
-                Text("In Home Screen")
+                RedButton(
+                    text = "Log out",
+                    onClick = {
+                        Firebase.auth.signOut()
+                        Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.logged_out),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
             }
         }
     }

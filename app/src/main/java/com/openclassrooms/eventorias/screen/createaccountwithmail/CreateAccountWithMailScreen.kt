@@ -14,9 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -56,9 +53,9 @@ fun CreateAccountWithMailScreen(
             modifier = Modifier.padding(innerPadding), onLogin, viewModel::createAccount, onError,
             email = user.email,
             onEmailChanged = { viewModel.onAction(FormEvent.EmailChanged(it)) },
-            name = user.name ?: "",
+            name = user.name,
             onNameChanged = { viewModel.onAction(FormEvent.NameChanged(it)) },
-            password = user.password ?: "",
+            password = user.password,
             onPasswordChanged = { viewModel.onAction(FormEvent.PasswordChanged(it)) },
             error
         )
@@ -79,9 +76,6 @@ fun CreateAccountWithMail(
     onPasswordChanged: (String) -> Unit,
     error: FormError?
 ) {
-    var emailLocal by remember { mutableStateOf(email) }
-    var nameLocal by remember { mutableStateOf(name) }
-    var passwordLocal by remember { mutableStateOf(password) }
 
     Column(
         modifier
@@ -91,8 +85,8 @@ fun CreateAccountWithMail(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         CustomTextField(
-            value = emailLocal,
-            onValueChange = { emailLocal = it;onEmailChanged(it) },
+            value = email,
+            onValueChange = { onEmailChanged(it) },
             label = "E-mail",
             modifier = Modifier.fillMaxWidth()
         )
@@ -105,8 +99,8 @@ fun CreateAccountWithMail(
 
 
         CustomTextField(
-            value = nameLocal,
-            onValueChange = { nameLocal = it;onNameChanged(it) },
+            value = name,
+            onValueChange = { onNameChanged(it) },
             label = stringResource(R.string.first_and_last_name),
             modifier = Modifier.fillMaxWidth()
         )
@@ -118,8 +112,8 @@ fun CreateAccountWithMail(
         }
 
         CustomTextField(
-            value = passwordLocal,
-            onValueChange = { passwordLocal = it; onPasswordChanged(it) },
+            value = password,
+            onValueChange = { onPasswordChanged(it) },
             label = stringResource(R.string.password),
             modifier = Modifier.fillMaxWidth()
         )
@@ -160,7 +154,8 @@ fun CreateAccountWithMail(
 @Composable
 fun PreviewCreateAccountWithMail() {
     EventoriasTheme {
-        CreateAccountWithMail(onLogin = { },
+        CreateAccountWithMail(
+            onLogin = { },
             createAccount = { _, _, _ -> Tasks.forResult(null) },
             onError = { },
             email = "",

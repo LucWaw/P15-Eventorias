@@ -18,5 +18,7 @@
     <string name="error_password">The password must be at least 6 characters long.</string>
     <string name="error_name">Please provide a first and last name.</string>
     <string name="send_mail_error">Error when sending mail</string>
-    <string name="popup_message_recovery_account">Follow the instructions sent to address %$1s to recover your password.</string>
+    <string name="popup_message_recovery_account">Follow the instructions sent to address %1$s to recover your password.</string>
+    <string name="logged_out">Logged out!</string>
+    <string name="incorrect_password">Incorrect password</string>
 </resources>

@@ -9,6 +9,7 @@ import com.openclassrooms.eventorias.extension.StringExt.Companion.isValidEmail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -38,7 +39,7 @@ class CreateAccountWithMailViewModel(
     /**
      * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
      */
-    val error = user.map {
+    val error = user.drop(1).map {
             verifyPost()
         }.stateIn(
             scope = viewModelScope,
@@ -48,9 +49,9 @@ class CreateAccountWithMailViewModel(
 
     private fun verifyPost(): FormError? {
         return when {
+            !_user.value.email.isValidEmail() -> FormError.EmailError
             _user.value.name.isEmpty() -> FormError.NameError
             _user.value.password.length < 6 -> FormError.PasswordError
-            !_user.value.email.isValidEmail() -> FormError.EmailError
 
             else -> null
         }

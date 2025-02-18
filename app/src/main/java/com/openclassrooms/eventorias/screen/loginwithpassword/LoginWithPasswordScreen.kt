@@ -1,5 +1,6 @@
 package com.openclassrooms.eventorias.screen.loginwithpassword
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,10 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.AuthResult
@@ -31,6 +35,8 @@ import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
 import com.openclassrooms.eventorias.screen.component.WhiteButton
+import com.openclassrooms.eventorias.screen.createaccountwithmail.FormError
+import com.openclassrooms.eventorias.screen.createaccountwithmail.FormEvent
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -40,8 +46,7 @@ fun LoginWithPasswordScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginWithPasswordViewModel = koinViewModel(),
     onLogin: () -> Unit,
-    onRecoverClick: () -> Unit,
-    onError: () -> Unit
+    onRecoverClick: (String) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -53,7 +58,11 @@ fun LoginWithPasswordScreen(
             )
         }
     ) { innerPadding ->
-        LoginWithPassword(modifier = Modifier.padding(innerPadding), onLogin, onRecoverClick, onError, viewModel::login)
+        val user by viewModel.user.collectAsStateWithLifecycle()
+        val error by viewModel.error.collectAsStateWithLifecycle()
+        LoginWithPassword(modifier = Modifier.padding(innerPadding), onLogin, onRecoverClick, viewModel::login,
+            email = user.email,
+            onEmailChanged = { viewModel.onAction(FormEvent.EmailChanged(it)) },error)
 
     }
 }
@@ -62,9 +71,11 @@ fun LoginWithPasswordScreen(
 fun LoginWithPassword(
     modifier: Modifier = Modifier,
     onLogInClick: () -> Unit,
-    onRecoverClick: () -> Unit,
-    onError: () -> Unit,
-    login: (String, String) -> Task<AuthResult>
+    onRecoverClick: (String) -> Unit,
+    login: (String, String) -> Task<AuthResult>,
+    email: String,
+    onEmailChanged: (String) -> Unit,
+    error: FormError?
 ) {
     Column(
         modifier
@@ -73,7 +84,6 @@ fun LoginWithPassword(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        var emailLocal by remember { mutableStateOf("") }
         var passwordLocal by remember { mutableStateOf("") }
 
         Text(
@@ -82,11 +92,18 @@ fun LoginWithPassword(
         )
 
         CustomTextField(
-            value = emailLocal,
-            onValueChange = { emailLocal = it },
+            value = email,
+            onValueChange = { onEmailChanged(it) },
             label = "E-mail",
             modifier = Modifier.fillMaxWidth()
         )
+
+        if (error is FormError.EmailError) {
+            Text(
+                text = stringResource(id = error.messageRes),
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
 
         CustomTextField(
             value = passwordLocal,
@@ -97,16 +114,18 @@ fun LoginWithPassword(
 
         Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             WhiteButton(
+                modifier = Modifier.width(200.dp),
                 text = stringResource(R.string.cant_log_in),
-                onClick = { onRecoverClick() }
+                onClick = { onRecoverClick(email) }
             )
-
+            val context = LocalContext.current
             RedButton(
                 text = stringResource(R.string.log_In),
-                onClick = { login(emailLocal, passwordLocal).addOnSuccessListener {
+                onClick = { login(email, passwordLocal).addOnSuccessListener {
                     onLogInClick()
                 }.addOnFailureListener {
-                    onError()
+                    Toast.makeText(context,
+                        context.getString(R.string.incorrect_password), Toast.LENGTH_SHORT).show()
                 } },
             )
 
@@ -128,15 +147,17 @@ fun LoginWithPassword(
 
 }
 
-@Preview
+@Preview(locale = "en")
 @Composable
 fun PreviewLogInWithPassword() {
     EventoriasTheme {
         LoginWithPassword(
             onLogInClick = { },
-            onRecoverClick = { },
-            onError = { },
-            login = { _, _ -> Tasks.forResult(null) }
+            onRecoverClick = { _ -> },
+            login = { _, _ -> Tasks.forResult(null) },
+            email = "aaa",
+            onEmailChanged = {},
+            error = null
         )
     }
 }

@@ -19,5 +19,7 @@
     <string name="error_password">Le mot de passe doit comporter un minimum de 6 caractere.</string>
     <string name="error_name">Veuillez indiquer un prénom et un nom.</string>
     <string name="send_mail_error">Erreur d\'envoi du mail</string>
-    <string name="popup_message_recovery_account">Suivez les instructions envoyées à l\'adresse %$1s pour récuperer votre mot de passe</string>
+    <string name="popup_message_recovery_account">Suivez les instructions envoyées à l\'adresse %1$s pour récuperer votre mot de passe</string>
+    <string name="logged_out">Déconnecté !</string>
+    <string name="incorrect_password">Mot de passe incorrect</string>
 </resources>

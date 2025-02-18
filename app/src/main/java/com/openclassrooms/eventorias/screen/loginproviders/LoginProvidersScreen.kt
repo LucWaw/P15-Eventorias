@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen
+package com.openclassrooms.eventorias.screen.loginproviders
 
 import android.content.Context
 import android.util.Log
@@ -24,27 +24,33 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import com.google.firebase.Firebase
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.AuthResult
+import com.openclassrooms.eventorias.BuildConfig
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.ButtonWithEmailIcon
 import com.openclassrooms.eventorias.screen.component.ButtonWithGoogleIcon
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginProvidersScreen(
     modifier: Modifier = Modifier,
     onMailClick: () -> Unit,
+    viewModel: LoginProvidersViewModel = koinViewModel(),
     onGoogleSignIn: () -> Unit
 ) {
 
     Scaffold(modifier = modifier) { innerPadding ->
-        LoginProviders(modifier = Modifier.padding(innerPadding), onMailClick, onGoogleSignIn)
+        LoginProviders(
+            modifier = Modifier.padding(innerPadding),
+            onMailClick,
+            onGoogleSignIn,
+            viewModel::loginWithGoogle
+        )
     }
 
 }
@@ -53,7 +59,8 @@ fun LoginProvidersScreen(
 fun LoginProviders(
     modifier: Modifier = Modifier,
     onMailClick: () -> Unit,
-    onGoogleSignIn: () -> Unit
+    onGoogleSignIn: () -> Unit,
+    loginWithGoogle: (Credential) -> Task<AuthResult>
 ) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
@@ -73,7 +80,7 @@ fun LoginProviders(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     coroutineScope.launch {
-                        signInWithGoogle(context, onGoogleSignIn)
+                        signInWithGoogle(context, onGoogleSignIn, loginWithGoogle)
                     }
                 }
             )
@@ -87,10 +94,14 @@ fun LoginProviders(
 
 }
 
-suspend fun signInWithGoogle(context: Context, onGoogleSignIn: () -> Unit) {
+suspend fun signInWithGoogle(
+    context: Context,
+    onGoogleSignIn: () -> Unit,
+    loginWithGoogle: (Credential) -> Task<AuthResult>
+) {
 
     val googleIdOption: GetSignInWithGoogleOption =
-        GetSignInWithGoogleOption.Builder("710750610457-6j9ib7dnt3o5b9g3cjiqsldcjb4on0ks.apps.googleusercontent.com")
+        GetSignInWithGoogleOption.Builder(BuildConfig.WEB_ID)
             .build()
 
     val request: GetCredentialRequest = GetCredentialRequest.Builder()
@@ -107,52 +118,22 @@ suspend fun signInWithGoogle(context: Context, onGoogleSignIn: () -> Unit) {
         return
     }
 
-    handleSignIn(credential, onGoogleSignIn)
-}
-
-fun handleSignIn(result: Credential, onGoogleSignIn: () -> Unit) {
-    when (result) {
-        is GoogleIdTokenCredential -> {
-            if (result.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                try {
-
-                    val googleIdTokenCredential = GoogleIdTokenCredential
-                        .createFrom(result.data)
-                    val firebaseCredential =
-                        GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
-                    Firebase.auth.signInWithCredential(firebaseCredential)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Log.d("GooGleSignIn", "signInWithCredential:success")
-                                onGoogleSignIn()
-                            } else {
-                                Log.e(
-                                    "GooGleSignIn",
-                                    "signInWithCredential:failure",
-                                    task.exception
-                                )
-
-                            }
-                        }
-                    //TODO DEPLACER DANS REPOSITORY ET ADD CREATION DE USER FIRESTORE
-                } catch (e: GoogleIdTokenParsingException) {
-                    Log.e("GooGleSignIn", "Received an invalid google id token response", e)
-                }
-            } else {
-                Log.e("GooGleSignIn", "Unexpected type of credential")
-            }
-        }
-
-        else -> {
-            Log.e("GooGleSignIn", "Unexpected type of credential : 64${result.type}")
-        }
+    loginWithGoogle(credential).addOnSuccessListener { result ->
+        onGoogleSignIn()
+    }.addOnFailureListener { e ->
+        Log.e("GooGleSignIn", "Error signing in with Google", e)
     }
 }
+
 
 @Preview
 @Composable
 fun LogInProvidersPreview() {
     EventoriasTheme {
-        LoginProviders(onMailClick = { }, onGoogleSignIn = { })
+        LoginProviders(
+            onMailClick = { },
+            onGoogleSignIn = { },
+            loginWithGoogle = { _ -> Tasks.forResult(null) }
+        )
     }
 }
