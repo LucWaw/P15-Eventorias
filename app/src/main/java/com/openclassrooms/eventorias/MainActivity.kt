@@ -48,7 +48,9 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.LogInProviders.route) {
                     LoginProvidersScreen(
                         onMailClick = { navHostController.navigate(Screen.LogInMailSelector.route) },
-                        onGoogleSignIn = { navHostController.navigate(Screen.Home.route) },
+                        onGoogleSignIn = { navHostController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.LogInProviders.route) { inclusive = true }//MARCHE BIEN
+                        } },
                     )
                 }
                 composable(Screen.LogInMailSelector.route) {
@@ -60,7 +62,9 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.LogInWithPassword.route) {
                     LoginWithPasswordScreen(
                         onLogin = {
-                            navHostController.navigate(Screen.Home.route); Toast.makeText(
+                            navHostController.navigate(Screen.Home.route){
+                                popUpTo(Screen.LogInProviders.route) { inclusive = true }
+                            } ; Toast.makeText(
                             this@MainActivity,
                             getString(R.string.logged_in),
                             Toast.LENGTH_SHORT
@@ -71,7 +75,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(Screen.CreateAccountWithMail.route) {
                     CreateAccountWithMailScreen(onLogin = {
-                        navHostController.navigate(Screen.Home.route); Toast.makeText(
+                        navHostController.navigate(Screen.Home.route){
+                            popUpTo(Screen.LogInProviders.route) { inclusive = true }
+                        } ; Toast.makeText(
                         this@MainActivity,
                         getString(R.string.logged_in),
                         Toast.LENGTH_SHORT
@@ -111,6 +117,7 @@ class MainActivity : ComponentActivity() {
                             getString(R.string.logged_out),
                             Toast.LENGTH_SHORT
                         ).show()
+                        navHostController.navigate(Screen.LogInProviders.route)
                     }
                 )
             }
