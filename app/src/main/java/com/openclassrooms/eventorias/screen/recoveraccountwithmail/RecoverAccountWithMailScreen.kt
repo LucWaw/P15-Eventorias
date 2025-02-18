@@ -1,10 +1,9 @@
-package com.openclassrooms.eventorias.screen
+package com.openclassrooms.eventorias.screen.recoveraccountwithmail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,15 +22,16 @@ import androidx.compose.ui.unit.dp
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
-import com.openclassrooms.eventorias.screen.component.WhiteButton
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
+import org.koin.compose.viewmodel.koinViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginWithPasswordScreen(
+fun RecoverAccountWithMailScreen(
     modifier: Modifier = Modifier,
-    onLogin: () -> Unit,
-    onRecoverClick: () -> Unit
+    viewModel: RecoverAccountWithMailViewModel = koinViewModel(),
+    onRecover: () -> Unit, mail: String
 ) {
     Scaffold(
         modifier = modifier,
@@ -43,17 +43,12 @@ fun LoginWithPasswordScreen(
             )
         }
     ) { innerPadding ->
-        LoginWithPassword(modifier = Modifier.padding(innerPadding), onLogin, onRecoverClick)
-
+        RecoverAccountWithMail(modifier = Modifier.padding(innerPadding), onRecover, mail)
     }
 }
 
 @Composable
-fun LoginWithPassword(
-    modifier: Modifier = Modifier,
-    onLogInClick: () -> Unit,
-    onRecoverClick: () -> Unit
-) {
+fun RecoverAccountWithMail(modifier: Modifier = Modifier, onRecover: () -> Unit, mail: String) {
     Column(
         modifier
             .fillMaxSize()
@@ -63,38 +58,22 @@ fun LoginWithPassword(
     ) {
 
         Text(
-            text = stringResource(R.string.log_in_with_password),
+            text = stringResource(R.string.recover_account),
             color = MaterialTheme.colorScheme.secondary
         )
 
         CustomTextField(
-            value = "",
+            value = mail,
             onValueChange = {},
             label = "E-mail",
             modifier = Modifier.fillMaxWidth()
         )
-
-        CustomTextField(
-            value = "",
-            onValueChange = {},
-            label = stringResource(R.string.password),
-            modifier = Modifier.fillMaxWidth()
+        RedButton(
+            text = stringResource(R.string.send),
+            onClick = { /*TODO Dialog + onRecover*/ },
+            modifier = Modifier.align(Alignment.End)
         )
-
-        Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            WhiteButton(
-                text = stringResource(R.string.cant_log_in),
-                onClick = { onRecoverClick() }
-            )
-
-            RedButton(
-                text = stringResource(R.string.log_In),
-                onClick = { /*TODO*/ },//if (viewmodel.login) onLogInClick() else Toast
-            )
-
-        }
     }
-
 
 
     Box(
@@ -112,8 +91,8 @@ fun LoginWithPassword(
 
 @Preview
 @Composable
-fun PreviewLogInWithPassword() {
+fun PreviewRecoverAccountWithMailScreen() {
     EventoriasTheme {
-        LoginWithPassword(onLogInClick = {  }, onRecoverClick = {  })
+        RecoverAccountWithMail(onRecover = {}, mail = "")
     }
 }

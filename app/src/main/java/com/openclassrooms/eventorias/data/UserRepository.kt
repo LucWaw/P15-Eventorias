@@ -1,7 +1,9 @@
 package com.openclassrooms.eventorias.data
 
+import android.content.Context
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.CollectionReference
@@ -18,16 +20,38 @@ class UserRepository {
         return FirebaseAuth.getInstance().currentUser
     }
 
-    fun loginWithPassword(email: String, password: String) {
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+    fun loginWithPassword(email: String, password: String, name: String = ""): Task<AuthResult> {
+        return FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+    }
+
+    private fun createWithPassword(email: String, password: String): Task<AuthResult> {
+        return FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+    }
+
+    fun createWithPassword(email: String, password: String, name: String): Task<AuthResult> {
+        return createWithPassword(email, password).addOnSuccessListener {
+            createUser(name)
+        }
+    }
+
+    fun sendRecoverMail(email: String): Task<Void> {
+        return FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+    }
+
+    fun signOut() {
+        return FirebaseAuth.getInstance().signOut()
+    }
+
+    fun deleteUser(context: Context): Task<Void> {
+        return getCurrentUser()?.delete() ?: Tasks.forResult(null)
     }
 
     // Create User in Firestore
-    fun createUser(name : String) {
+    private fun createUser(name: String) {
         val user = getCurrentUser()
         if (user != null) {
             val uid = user.uid
-            val userToCreate = User(uid, user.displayName ?: "")
+            val userToCreate = User(uid, name)
 
             getUsersCollection().document(uid).set(userToCreate)
         }
@@ -38,7 +62,7 @@ class UserRepository {
     }
 
     // Delete the User from Firestore
-    fun deleteUserFromFirestore() : Task<Void> {
+    fun deleteUserFromFirestore(): Task<Void> {
         val uid: String? = getCurrentUserUID()
         if (uid != null) {
             return getUsersCollection().document(uid).delete()

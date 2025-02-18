@@ -14,4 +14,8 @@
     <string name="already_have_an_account">Déjà un compte ? Se Connecter</string>
     <string name="not_account">Pas de compte ? Creer un compte</string>
     <string name="logged_in">Connecté avec succes !</string>
+    <string name="connetion_error">Erreur de connexion</string>
+    <string name="error_email">E-mail invalide.</string>
+    <string name="error_password">Le mot de passe doit comporter un minimum de 6 caractere.</string>
+    <string name="error_name">Veuillez indiquer un prénom et un nom.</string>
 </resources>

@@ -49,6 +49,16 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
+    //Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
+    implementation(libs.koin.androidx.navigation)
+
+
+
+
     implementation(libs.navigation.compose)
 
 

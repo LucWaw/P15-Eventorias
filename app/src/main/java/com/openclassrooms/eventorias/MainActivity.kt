@@ -12,11 +12,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.openclassrooms.eventorias.screen.CreateAccountWithMailScreen
+import com.openclassrooms.eventorias.screen.createaccountwithmail.CreateAccountWithMailScreen
 import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
 import com.openclassrooms.eventorias.screen.LoginProvidersScreen
-import com.openclassrooms.eventorias.screen.LoginWithPasswordScreen
-import com.openclassrooms.eventorias.screen.RecoverAccountWithMailScreen
+import com.openclassrooms.eventorias.screen.loginwithpassword.LoginWithPasswordScreen
+import com.openclassrooms.eventorias.screen.recoveraccountwithmail.RecoverAccountWithMailScreen
 import com.openclassrooms.eventorias.screen.Screen
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 
@@ -59,15 +59,19 @@ class MainActivity : ComponentActivity() {
                             getString(R.string.logged_in),
                             Toast.LENGTH_SHORT
                         ).show() },
-                        onRecoverClick = { navHostController.navigate("${Screen.RecoverAccountWithMail.route}/${it}") }
+                        onRecoverClick = { navHostController.navigate("${Screen.RecoverAccountWithMail.route}/${it}") },
+                        onError = { navHostController.navigate(Screen.LogInProviders.route) ;Toast.makeText(this@MainActivity,
+                            getString(R.string.connetion_error), Toast.LENGTH_SHORT).show() }
                     )
                 }
                 composable(Screen.CreateAccountWithMail.route) {
-                    CreateAccountWithMailScreen{ navHostController.navigate(Screen.Home.route); Toast.makeText(
+                    CreateAccountWithMailScreen(onLogin = { navHostController.navigate(Screen.Home.route); Toast.makeText(
                         this@MainActivity,
                         getString(R.string.logged_in),
                         Toast.LENGTH_SHORT
-                    ).show() }
+                    ).show() },
+                        onError = { navHostController.navigate(Screen.LogInProviders.route) ;Toast.makeText(this@MainActivity,
+                            getString(R.string.connetion_error), Toast.LENGTH_SHORT).show() })
                 }
                 composable(route = "${Screen.RecoverAccountWithMail.route}/{mail}",
                     arguments = Screen.RecoverAccountWithMail.navArguments) { backStackEntry ->

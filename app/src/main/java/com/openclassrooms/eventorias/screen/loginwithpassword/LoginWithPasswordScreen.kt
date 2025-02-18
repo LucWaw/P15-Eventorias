@@ -1,13 +1,15 @@
-package com.openclassrooms.eventorias.screen
+package com.openclassrooms.eventorias.screen.loginwithpassword
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -21,11 +23,19 @@ import androidx.compose.ui.unit.dp
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
+import com.openclassrooms.eventorias.screen.component.WhiteButton
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAccountWithMailScreen(modifier: Modifier = Modifier, onLogin: () -> Unit) {
+fun LoginWithPasswordScreen(
+    modifier: Modifier = Modifier,
+    viewModel: LoginWithPasswordViewModel = koinViewModel(),
+    onLogin: () -> Unit,
+    onRecoverClick: () -> Unit,
+    onError: () -> Unit
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -36,13 +46,17 @@ fun CreateAccountWithMailScreen(modifier: Modifier = Modifier, onLogin: () -> Un
             )
         }
     ) { innerPadding ->
-        CreateAccountWithMail(modifier = Modifier.padding(innerPadding), onLogin)
+        LoginWithPassword(modifier = Modifier.padding(innerPadding), onLogin, onRecoverClick)
 
     }
 }
 
 @Composable
-fun CreateAccountWithMail(modifier: Modifier = Modifier, onLogin: () -> Unit) {
+fun LoginWithPassword(
+    modifier: Modifier = Modifier,
+    onLogInClick: () -> Unit,
+    onRecoverClick: () -> Unit
+) {
     Column(
         modifier
             .fillMaxSize()
@@ -50,16 +64,16 @@ fun CreateAccountWithMail(modifier: Modifier = Modifier, onLogin: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+
+        Text(
+            text = stringResource(R.string.log_in_with_password),
+            color = MaterialTheme.colorScheme.secondary
+        )
+
         CustomTextField(
             value = "",
             onValueChange = {},
             label = "E-mail",
-            modifier = Modifier.fillMaxWidth()
-        )
-        CustomTextField(
-            value = "",
-            onValueChange = {},
-            label = stringResource(R.string.first_and_last_name),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -69,13 +83,23 @@ fun CreateAccountWithMail(modifier: Modifier = Modifier, onLogin: () -> Unit) {
             label = stringResource(R.string.password),
             modifier = Modifier.fillMaxWidth()
         )
-        RedButton(
-            text = stringResource(R.string.create_account),
-            onClick = { /*TODO*/ },
-            modifier = Modifier.align(Alignment.End)
-        )
 
+        Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            WhiteButton(
+                text = stringResource(R.string.cant_log_in),
+                onClick = { onRecoverClick() }
+            )
+
+            RedButton(
+                text = stringResource(R.string.log_In),
+                onClick = { /*TODO*/ },//if (viewmodel.login) onLogInClick() else Toast
+            )
+
+        }
     }
+
+
+
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -86,12 +110,13 @@ fun CreateAccountWithMail(modifier: Modifier = Modifier, onLogin: () -> Unit) {
         )
 
     }
+
 }
 
 @Preview
 @Composable
-fun PreviewCreateAccountWithMail() {
+fun PreviewLogInWithPassword() {
     EventoriasTheme {
-        CreateAccountWithMail(onLogin = {  })
+        LoginWithPassword(onLogInClick = {  }, onRecoverClick = {  })
     }
 }

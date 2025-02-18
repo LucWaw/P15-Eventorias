@@ -23,11 +23,13 @@ import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 
 @Composable
 fun RedButton(
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String
 ) {
     Button(
+        enabled = enabled,
         modifier = modifier,
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
