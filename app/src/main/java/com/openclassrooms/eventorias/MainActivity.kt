@@ -11,6 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
 import com.openclassrooms.eventorias.screen.Screen
 import com.openclassrooms.eventorias.screen.homefeed.HomeFeedScreen
@@ -37,7 +39,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun EventoriasNavHost(navHostController: NavHostController) {
         NavHost(
-            navController = navHostController, startDestination = Screen.Auth.route
+            navController = navHostController, startDestination = if (Firebase.auth.currentUser != null)Screen.Home.route else Screen.Auth.route
         ) {
             navigation(
                 startDestination = Screen.LogInProviders.route,

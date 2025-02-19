@@ -13,4 +13,6 @@ class LoginProvidersViewModel(
     fun loginWithGoogle(credentials : Credential) : Task<AuthResult>{
         return userRepository.loginWithGoogle(credentials)
     }
+
+
 }

@@ -43,7 +43,6 @@ fun LoginProvidersScreen(
     viewModel: LoginProvidersViewModel = koinViewModel(),
     onGoogleSignIn: () -> Unit
 ) {
-
     Scaffold(modifier = modifier) { innerPadding ->
         LoginProviders(
             modifier = Modifier.padding(innerPadding),
