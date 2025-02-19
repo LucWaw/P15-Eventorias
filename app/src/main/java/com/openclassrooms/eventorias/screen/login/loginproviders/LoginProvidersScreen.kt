@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen.loginproviders
+package com.openclassrooms.eventorias.screen.login.loginproviders
 
 import android.content.Context
 import android.util.Log

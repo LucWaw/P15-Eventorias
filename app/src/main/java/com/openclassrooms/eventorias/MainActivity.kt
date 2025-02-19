@@ -16,10 +16,10 @@ import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
 import com.openclassrooms.eventorias.screen.Screen
 import com.openclassrooms.eventorias.screen.component.RedButton
-import com.openclassrooms.eventorias.screen.createaccountwithmail.CreateAccountWithMailScreen
-import com.openclassrooms.eventorias.screen.loginproviders.LoginProvidersScreen
-import com.openclassrooms.eventorias.screen.loginwithpassword.LoginWithPasswordScreen
-import com.openclassrooms.eventorias.screen.recoveraccountwithmail.RecoverAccountWithMailScreen
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.CreateAccountWithMailScreen
+import com.openclassrooms.eventorias.screen.login.loginproviders.LoginProvidersScreen
+import com.openclassrooms.eventorias.screen.login.loginwithpassword.LoginWithPasswordScreen
+import com.openclassrooms.eventorias.screen.login.recoveraccountwithmail.RecoverAccountWithMailScreen
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 
 class MainActivity : ComponentActivity() {
@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
                     val mail = backStackEntry.arguments?.getString("mail") ?: ""
                     RecoverAccountWithMailScreen(
                         onRecover = { navHostController.navigate(Screen.LogInWithPassword.route) },
-                        mail = mail,
+                        mailInit = mail,
                         onError = {
                             navHostController.navigate(Screen.LogInProviders.route);Toast.makeText(
                             this@MainActivity,

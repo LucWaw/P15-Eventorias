@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen.createaccountwithmail
+package com.openclassrooms.eventorias.screen.login.createaccountwithmail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -125,7 +125,7 @@ fun CreateAccountWithMail(
         }
 
         RedButton(
-            enabled = error == null,
+            enabled = error == null && email.isNotEmpty() && password.isNotEmpty() && name.isNotEmpty(),
             text = stringResource(R.string.create_account),
             onClick = {
                 createAccount(email, password, name).addOnSuccessListener {

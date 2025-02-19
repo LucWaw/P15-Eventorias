@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen.loginwithpassword
+package com.openclassrooms.eventorias.screen.login.loginwithpassword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,9 +6,9 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.openclassrooms.eventorias.data.UserRepository
 import com.openclassrooms.eventorias.extension.StringExt.Companion.isValidEmail
-import com.openclassrooms.eventorias.screen.createaccountwithmail.FormError
-import com.openclassrooms.eventorias.screen.createaccountwithmail.FormEvent
-import com.openclassrooms.eventorias.screen.createaccountwithmail.UserVerfication
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormError
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormEvent
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.UserVerfication
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

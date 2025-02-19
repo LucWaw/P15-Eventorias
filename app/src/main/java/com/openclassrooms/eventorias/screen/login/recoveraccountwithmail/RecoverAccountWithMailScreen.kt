@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen.recoveraccountwithmail
+package com.openclassrooms.eventorias.screen.login.recoveraccountwithmail
 
 import android.app.AlertDialog
 import android.content.Context
@@ -15,10 +15,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,11 +24,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormError
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormEvent
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -40,7 +41,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RecoverAccountWithMailScreen(
     modifier: Modifier = Modifier,
     viewModel: RecoverAccountWithMailViewModel = koinViewModel(),
-    onRecover: () -> Unit, mail: String, onError: () -> Unit
+    onRecover: () -> Unit, mailInit: String, onError: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -52,12 +53,18 @@ fun RecoverAccountWithMailScreen(
             )
         }
     ) { innerPadding ->
+        val user by viewModel.user.collectAsStateWithLifecycle()
+        val error by viewModel.error.collectAsStateWithLifecycle()
+        LaunchedEffect(1) { viewModel.onAction(FormEvent.EmailChanged(mailInit)) }
         RecoverAccountWithMail(
             modifier = Modifier.padding(innerPadding),
             onRecover,
-            mail,
             onError,
-            viewModel::recoverAccountWithMail
+            viewModel::recoverAccountWithMail,
+            error,
+            user.email,
+            onEmailChanged = { viewModel.onAction(FormEvent.EmailChanged(it)) }
+
         )
     }
 }
@@ -66,9 +73,11 @@ fun RecoverAccountWithMailScreen(
 fun RecoverAccountWithMail(
     modifier: Modifier = Modifier,
     onRecover: () -> Unit,
-    mail: String,
     onError: () -> Unit,
-    recover: (String) -> Task<Void>
+    recover: (String) -> Task<Void>,
+    error: FormError?,
+    email: String,
+    onEmailChanged: (String) -> Unit
 ) {
     Column(
         modifier
@@ -82,22 +91,29 @@ fun RecoverAccountWithMail(
             text = stringResource(R.string.recover_account),
             color = MaterialTheme.colorScheme.secondary
         )
-        var mailLocal by remember { mutableStateOf(mail) }
+
 
 
         CustomTextField(
-            value = mailLocal,
-            onValueChange = { mailLocal = it },
+            value = email,
+            onValueChange = { onEmailChanged(it) },
             label = "E-mail",
             modifier = Modifier.fillMaxWidth()
         )
+        if (error is FormError.EmailError) {
+            Text(
+                text = stringResource(id = error.messageRes),
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
         val recoveryPopupMessage =
-            stringResource(R.string.popup_message_recovery_account, mailLocal)
+            stringResource(R.string.popup_message_recovery_account, email)
         val context = LocalContext.current
         RedButton(
+            enabled = error == null && email.isNotEmpty(),
             text = stringResource(R.string.send),
             onClick = {
-                recover(mailLocal).addOnSuccessListener {
+                recover(email).addOnSuccessListener {
                     openMailSendDialog(
                         context = context,
                         onRecover = onRecover,
@@ -144,10 +160,12 @@ private fun openMailSendDialog(
 fun PreviewRecoverAccountWithMailScreen() {
     EventoriasTheme {
         RecoverAccountWithMail(
-            onRecover = {},
-            mail = "",
-            onError = {},
-            recover = { _ -> Tasks.forResult(null) }
+            onRecover = { },
+            onError = { },
+            recover = { Tasks.forResult(null) },
+            error = null,
+            email = "",
+            onEmailChanged = { }
         )
     }
 }

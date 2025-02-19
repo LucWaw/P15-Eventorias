@@ -1,11 +1,13 @@
-package com.openclassrooms.eventorias.screen.createaccountwithmail
+package com.openclassrooms.eventorias.screen.login.recoveraccountwithmail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.openclassrooms.eventorias.data.UserRepository
 import com.openclassrooms.eventorias.extension.StringExt.Companion.isValidEmail
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormError
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormEvent
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.UserVerfication
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +15,12 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class CreateAccountWithMailViewModel(
+class RecoverAccountWithMailViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
-    fun createAccount(email: String, password: String, name: String): Task<AuthResult> {
-        return userRepository.createWithPassword(email, password, name)
+
+    fun recoverAccountWithMail(email : String): Task<Void> {
+        return userRepository.sendRecoverMail(email)
     }
 
     /**
@@ -40,19 +43,16 @@ class CreateAccountWithMailViewModel(
      * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
      */
     val error = user.drop(1).map {
-            verifyPost()
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = null,
-        )
+        verifyPost()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null,
+    )
 
     private fun verifyPost(): FormError? {
         return when {
             !_user.value.email.isValidEmail() -> FormError.EmailError
-            _user.value.name.isEmpty() -> FormError.NameError
-            _user.value.password.length < 6 -> FormError.PasswordError
-
             else -> null
         }
     }
@@ -70,19 +70,8 @@ class CreateAccountWithMailViewModel(
                 )
             }
 
-            is FormEvent.NameChanged -> {
-                _user.value = _user.value.copy(
-                    name = formEvent.name
-                )
-            }
-
-            is FormEvent.PasswordChanged -> {
-                _user.value = _user.value.copy(password = formEvent.password)
-            }
+            is FormEvent.NameChanged -> {}
+            is FormEvent.PasswordChanged -> {}
         }
     }
 }
-
-data class UserVerfication(
-    val name: String, val email: String, val password: String
-)

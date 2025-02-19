@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen.createaccountwithmail
+package com.openclassrooms.eventorias.screen.login.createaccountwithmail
 
 import androidx.annotation.StringRes
 import com.openclassrooms.eventorias.R

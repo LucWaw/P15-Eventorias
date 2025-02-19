@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen.loginproviders
+package com.openclassrooms.eventorias.screen.login.loginproviders
 
 import androidx.credentials.Credential
 import androidx.lifecycle.ViewModel

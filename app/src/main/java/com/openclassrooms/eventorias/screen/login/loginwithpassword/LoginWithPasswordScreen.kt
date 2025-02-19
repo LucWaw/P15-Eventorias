@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen.loginwithpassword
+package com.openclassrooms.eventorias.screen.login.loginwithpassword
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -35,8 +35,8 @@ import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
 import com.openclassrooms.eventorias.screen.component.WhiteButton
-import com.openclassrooms.eventorias.screen.createaccountwithmail.FormError
-import com.openclassrooms.eventorias.screen.createaccountwithmail.FormEvent
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormError
+import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormEvent
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -120,6 +120,7 @@ fun LoginWithPassword(
             )
             val context = LocalContext.current
             RedButton(
+                enabled = error == null && email.isNotEmpty() && passwordLocal.isNotEmpty(),
                 text = stringResource(R.string.log_In),
                 onClick = { login(email, passwordLocal).addOnSuccessListener {
                     onLogInClick()
