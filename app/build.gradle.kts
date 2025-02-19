@@ -46,6 +46,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -57,6 +59,11 @@ android {
 }
 
 dependencies {
+    //TO ALLOW USE OF JAVA DATE TIME API
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.coil.compose)
+
+
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)

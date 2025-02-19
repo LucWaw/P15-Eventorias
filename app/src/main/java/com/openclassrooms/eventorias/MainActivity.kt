@@ -11,11 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
 import com.openclassrooms.eventorias.screen.Screen
-import com.openclassrooms.eventorias.screen.component.RedButton
+import com.openclassrooms.eventorias.screen.homefeed.HomeFeedScreen
 import com.openclassrooms.eventorias.screen.login.createaccountwithmail.CreateAccountWithMailScreen
 import com.openclassrooms.eventorias.screen.login.loginproviders.LoginProvidersScreen
 import com.openclassrooms.eventorias.screen.login.loginwithpassword.LoginWithPasswordScreen
@@ -48,9 +46,13 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.LogInProviders.route) {
                     LoginProvidersScreen(
                         onMailClick = { navHostController.navigate(Screen.LogInMailSelector.route) },
-                        onGoogleSignIn = { navHostController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.LogInProviders.route) { inclusive = true }//MARCHE BIEN
-                        } },
+                        onGoogleSignIn = {
+                            navHostController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.LogInProviders.route) {
+                                    inclusive = true
+                                }//MARCHE BIEN
+                            }
+                        },
                     )
                 }
                 composable(Screen.LogInMailSelector.route) {
@@ -62,9 +64,9 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.LogInWithPassword.route) {
                     LoginWithPasswordScreen(
                         onLogin = {
-                            navHostController.navigate(Screen.Home.route){
+                            navHostController.navigate(Screen.Home.route) {
                                 popUpTo(Screen.LogInProviders.route) { inclusive = true }
-                            } ; Toast.makeText(
+                            }; Toast.makeText(
                             this@MainActivity,
                             getString(R.string.logged_in),
                             Toast.LENGTH_SHORT
@@ -75,9 +77,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(Screen.CreateAccountWithMail.route) {
                     CreateAccountWithMailScreen(onLogin = {
-                        navHostController.navigate(Screen.Home.route){
+                        navHostController.navigate(Screen.Home.route) {
                             popUpTo(Screen.LogInProviders.route) { inclusive = true }
-                        } ; Toast.makeText(
+                        }; Toast.makeText(
                         this@MainActivity,
                         getString(R.string.logged_in),
                         Toast.LENGTH_SHORT
@@ -108,18 +110,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable(Screen.Home.route) {
-                RedButton(
-                    text = "Log out",
-                    onClick = {
-                        Firebase.auth.signOut()
-                        Toast.makeText(
-                            this@MainActivity,
-                            getString(R.string.logged_out),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        navHostController.navigate(Screen.LogInProviders.route)
-                    }
-                )
+                HomeFeedScreen()
             }
         }
     }
