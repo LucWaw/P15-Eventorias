@@ -29,4 +29,6 @@
     <string name="errorTitle">Error</string>
     <string name="errorDescription">An error has occurred, please try again later</string>
     <string name="retry">Try again</string>
+    <string name="events">Events</string>
+    <string name="profile">Profile</string>
 </resources>

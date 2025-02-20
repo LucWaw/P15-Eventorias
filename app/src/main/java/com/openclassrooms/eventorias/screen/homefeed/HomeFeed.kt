@@ -55,21 +55,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.util.DebugLogger
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
 import com.openclassrooms.eventorias.extension.LocalDateExt.Companion.toHumanDate
 import com.openclassrooms.eventorias.screen.component.RedButton
-import com.openclassrooms.eventorias.screen.component.WhiteButton
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import com.openclassrooms.eventorias.ui.theme.GreyDate
 import com.openclassrooms.eventorias.ui.theme.GreySuperLight
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
@@ -148,7 +145,6 @@ fun HomeFeedScreen(
     ) { innerPadding ->
 
 
-
         if (state.isLoading) {
             Box(
                 modifier = modifier.fillMaxSize(),
@@ -159,19 +155,16 @@ fun HomeFeedScreen(
         } else if (state.isError) {
             ErrorState(
                 modifier = modifier.padding(innerPadding),
-                onTryAgain = { scope.launch {
-                    viewModel.loadEvent().collect{}
-                } }
+                onTryAgain = {
+                    scope.launch {
+                        viewModel.loadEvent().collect {}
+                    }
+                }
             )
         } else {
 
             HomeFeed(modifier = Modifier.padding(innerPadding), state.event)
-            WhiteButton(
-                modifier = Modifier
-                    .padding(24.dp),
-                text = "Logout",
-                onClick = { Firebase.auth.signOut() }
-            )
+
         }
     }
 }
@@ -205,10 +198,11 @@ fun EventCell(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(), horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxHeight(), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = modifier.padding(horizontal = 16.dp, vertical = 20.dp),
+                modifier = modifier.padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -238,9 +232,8 @@ fun EventCell(
                     )
                     Text(
                         text = event.eventDate.toHumanDate(),
-                        color = GreyDate,
-
-                        )
+                        color = GreyDate
+                    )
 
                 }
             }
@@ -336,7 +329,7 @@ fun EventCellPreview() {
                 "5",
                 "The Secret of the Flowers",
                 "Improve your goldfish's physical fitness by getting him a bicycle.",
-                LocalDate.of(2021, 8, 25),
+                LocalDate.of(2021, 1, 25),
                 LocalTime.of(10, 0),
                 "Location 1",
                 "https://picsum.photos/id/80/1080/",

@@ -10,6 +10,8 @@ sealed class Screen(
 ) {
     data object Home : Screen("home")
 
+    data object Profile : Screen("profile")
+
     data object Auth : Screen("auth")
 
     data object LogInProviders : Screen("logInProviders")

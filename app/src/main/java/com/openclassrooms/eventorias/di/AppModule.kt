@@ -10,10 +10,10 @@ import com.openclassrooms.eventorias.data.EventRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import com.openclassrooms.eventorias.data.UserRepository
-import com.openclassrooms.eventorias.data.service.EventFakeApi
+import com.openclassrooms.eventorias.data.service.EventFirebaseApi
 
 val appModule = module {
-    singleOf(::EventFakeApi)
+    singleOf(::EventFirebaseApi)
     singleOf(::EventRepository)
     singleOf(::UserRepository)
 

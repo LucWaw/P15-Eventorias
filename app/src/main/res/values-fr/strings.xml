@@ -30,4 +30,6 @@
     <string name="errorTitle">Erreur</string>
     <string name="errorDescription">Une erreur s\'est produite, veuillez réessayer plus tard</string>
     <string name="retry">Réessayer</string>
+    <string name="events">Événements</string>
+    <string name="profile">Profile</string>
 </resources>

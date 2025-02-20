@@ -1,6 +1,6 @@
 package com.openclassrooms.eventorias.domain
 
-import java.io.Serializable
+import com.openclassrooms.eventorias.data.entity.EventDto
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -18,4 +18,28 @@ data class Event(
     val eventLocation: String = "",
     val photoUrl: String? = null,
     val author: User = User()
-) : Serializable
+) {
+    fun toDto() = EventDto(
+        id = id,
+        title = title,
+        description = description,
+        eventDate = eventDate.toEpochDay(),
+        eventHours = eventHours.toSecondOfDay(),
+        eventLocation = eventLocation,
+        photoUrl = photoUrl,
+        author = author
+    )
+
+    companion object {
+        fun fromDto(dto: EventDto) = Event(
+            id = dto.id,
+            title = dto.title,
+            description = dto.description,
+            eventDate = LocalDate.ofEpochDay(dto.eventDate),
+            eventHours = LocalTime.ofSecondOfDay(dto.eventHours.toLong()),
+            eventLocation = dto.eventLocation,
+            photoUrl = dto.photoUrl,
+            author = dto.author
+        )
+    }
+}
