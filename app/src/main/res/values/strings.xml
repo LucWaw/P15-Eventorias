@@ -25,4 +25,8 @@
     <string name="event_List">Event list</string>
     <string name="search_an_item">Search through events</string>
     <string name="sort_event">Sort events by name or date</string>
+    <string name="error">Error Icon</string>
+    <string name="errorTitle">Error</string>
+    <string name="errorDescription">An error has occurred, please try again later</string>
+    <string name="retry">Try again</string>
 </resources>

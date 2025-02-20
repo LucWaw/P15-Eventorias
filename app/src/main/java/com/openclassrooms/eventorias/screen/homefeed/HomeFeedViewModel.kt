@@ -1,38 +1,83 @@
 package com.openclassrooms.eventorias.screen.homefeed
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.eventorias.data.EventRepository
 import com.openclassrooms.eventorias.domain.Event
+import com.openclassrooms.eventorias.domain.util.Result
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeFeedViewModel(val eventRepository: EventRepository) : ViewModel() {
-    private val _events: MutableStateFlow<List<Event>> = MutableStateFlow(emptyList())
-    val events: StateFlow<List<Event>>
-        get() = _events
+
+class HomeFeedViewModel(private val eventRepository: EventRepository) : ViewModel() {
+    private val _state: MutableStateFlow<EventListState> = MutableStateFlow(EventListState())
+    val state: StateFlow<EventListState>
+        get() = _state
 
     private var isSortedByDate = true
 
     init {
         viewModelScope.launch {
-            eventRepository.events.collect {
-                _events.value = it
+            loadEvent().collect {}
+        }
+    }
+
+    fun loadEvent(): Flow<Result<Flow<List<Event>>>> {
+        return eventRepository.events.onEach {
+            when (it) {
+                is Result.Loading -> {
+                    _state.update { currentState ->
+                        currentState.copy(isLoading = true, isError = false)
+                    }
+                }
+
+                is Result.Success -> {
+                    it.data.collect { event ->
+                        _state.update { currentState ->
+                            currentState.copy(isLoading = false, event = event, isError = false)
+                        }
+                    }
+
+                }
+
+                is Result.Error -> {
+                    Log.e("HomeFeedViewModel", "Error loading events")
+
+                    _state.update { currentState ->
+                        currentState.copy(isLoading = false, isError = true)
+                    }
+                }
             }
         }
     }
 
-    fun filterEvents(filter : String) {
+    fun filterEvents(filter: String) {
         viewModelScope.launch {
-            eventRepository.events.collect {
-                _events.value = it.filter { event -> event.title.contains(filter, ignoreCase = true) }
+            eventRepository.events.collect { result ->
+                if (result is Result.Success) {
+                    result.data.collect {
+                        _state.update { currentState ->
+                            currentState.copy(event = it.filter {
+                                it.title.contains(
+                                    filter,
+                                    ignoreCase = true
+                                )
+                            })
+                        }
+                    }
+                }
             }
         }
+
     }
 
-    fun sortEvents(){
-        if(isSortedByDate){
+    fun sortEvents() {
+        if (isSortedByDate) {
             sortItemsByTitle()
             isSortedByDate = false
         } else {
@@ -42,17 +87,30 @@ class HomeFeedViewModel(val eventRepository: EventRepository) : ViewModel() {
     }
 
     private fun sortItemsByDateDesc() {
+
         viewModelScope.launch {
-            eventRepository.events.collect { event ->
-                _events.value = event.sortedByDescending { it.eventDate }
+            eventRepository.events.collect { result ->
+                if (result is Result.Success) {
+                    result.data.collect {
+                        _state.update { currentState ->
+                            currentState.copy(event = it.sortedByDescending { it.eventDate })
+                        }
+                    }
+                }
             }
         }
     }
 
     private fun sortItemsByTitle() {
         viewModelScope.launch {
-            eventRepository.events.collect { event ->
-                _events.value = event.sortedBy { it.title }
+            eventRepository.events.collect { result ->
+                if (result is Result.Success) {
+                    result.data.collect {
+                        _state.update { currentState ->
+                            currentState.copy(event = it.sortedBy { it.title })
+                        }
+                    }
+                }
             }
         }
     }

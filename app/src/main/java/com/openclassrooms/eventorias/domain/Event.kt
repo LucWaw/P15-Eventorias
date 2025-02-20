@@ -10,12 +10,12 @@ import java.time.LocalTime
  * The class implements Serializable to allow for potential serialization needs.
  */
 data class Event(
-    val id: String,
-    val title: String,
-    val description: String,
-    val eventDate: LocalDate,
-    val eventHours: LocalTime,
-    val eventLocation: String,
-    val photoUrl: String,
-    val author: User
+    val id: String = "",
+    val title: String = "",
+    val description: String = "",
+    val eventDate: LocalDate = LocalDate.now(),
+    val eventHours: LocalTime = LocalTime.now(),
+    val eventLocation: String = "",
+    val photoUrl: String? = null,
+    val author: User = User()
 ) : Serializable

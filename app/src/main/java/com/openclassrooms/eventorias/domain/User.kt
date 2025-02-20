@@ -3,7 +3,7 @@ package com.openclassrooms.eventorias.domain
 import java.io.Serializable
 
 data class User(
-    val uid: String,
-    val displayName: String,
+    val uid: String = "",
+    val displayName: String = "",
     val urlPicture : String? = null
 ) : Serializable

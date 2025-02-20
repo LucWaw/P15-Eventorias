@@ -1,5 +1,6 @@
 package com.openclassrooms.eventorias.screen.homefeed
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -33,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,9 +50,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.util.DebugLogger
@@ -59,6 +65,7 @@ import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
 import com.openclassrooms.eventorias.extension.LocalDateExt.Companion.toHumanDate
+import com.openclassrooms.eventorias.screen.component.RedButton
 import com.openclassrooms.eventorias.screen.component.WhiteButton
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import com.openclassrooms.eventorias.ui.theme.GreyDate
@@ -73,7 +80,8 @@ fun HomeFeedScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeFeedViewModel = koinViewModel(),
 ) {
-    val events by viewModel.events.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
 
     Scaffold(modifier = modifier,
@@ -138,13 +146,33 @@ fun HomeFeedScreen(
             }
         }
     ) { innerPadding ->
-        HomeFeed(modifier = Modifier.padding(innerPadding), events)
-        WhiteButton(
-            modifier = Modifier
-                .padding(24.dp),
-            text = "Logout",
-            onClick = { Firebase.auth.signOut() }
-        )
+
+
+
+        if (state.isLoading) {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (state.isError) {
+            ErrorState(
+                modifier = modifier.padding(innerPadding),
+                onTryAgain = { scope.launch {
+                    viewModel.loadEvent().collect{}
+                } }
+            )
+        } else {
+
+            HomeFeed(modifier = Modifier.padding(innerPadding), state.event)
+            WhiteButton(
+                modifier = Modifier
+                    .padding(24.dp),
+                text = "Logout",
+                onClick = { Firebase.auth.signOut() }
+            )
+        }
     }
 }
 
@@ -184,18 +212,21 @@ fun EventCell(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    model = event.author.urlPicture,
-                    imageLoader = LocalContext.current.imageLoader.newBuilder()
-                        .logger(DebugLogger())
-                        .build(),
-                    placeholder = ColorPainter(Color.White),
-                    contentDescription = "image",
-                    contentScale = ContentScale.Crop,
-                )
+                if (!event.author.urlPicture.isNullOrEmpty()) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        model = event.author.urlPicture,
+                        imageLoader = LocalContext.current.imageLoader.newBuilder()
+                            .logger(DebugLogger())
+                            .build(),
+                        placeholder = ColorPainter(Color.White),
+                        contentDescription = "image",
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = if (event.title.length < 20) event.title else event.title.substring(
@@ -219,18 +250,19 @@ fun EventCell(
                     .width(136.dp)
                     .clip(MaterialTheme.shapes.medium),
             ) {
-
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    model = event.photoUrl,
-                    imageLoader = LocalContext.current.imageLoader.newBuilder()
-                        .logger(DebugLogger())
-                        .build(),
-                    placeholder = ColorPainter(Color.White),
-                    contentDescription = "image",
-                    contentScale = ContentScale.Crop,
-                )
+                if (!event.photoUrl.isNullOrEmpty()) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        model = event.photoUrl,
+                        imageLoader = LocalContext.current.imageLoader.newBuilder()
+                            .logger(DebugLogger())
+                            .build(),
+                        placeholder = ColorPainter(Color.White),
+                        contentDescription = "image",
+                        contentScale = ContentScale.Crop,
+                    )
+                }
             }
         }
 
@@ -239,6 +271,61 @@ fun EventCell(
 
 }
 
+
+@Composable
+fun ErrorState(modifier: Modifier = Modifier, onTryAgain: () -> Unit) {
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.fillMaxSize()) {
+        Box(
+            modifier = modifier
+                .clip(
+                    CircleShape
+                )
+                .size(64.dp)
+                .background(MaterialTheme.colorScheme.onSurfaceVariant),
+            contentAlignment = Alignment.Center,
+
+            ) {
+            Icon(
+                painter = painterResource(id = R.drawable.icon_error),
+                contentDescription = stringResource(R.string.error),
+                tint = Color.White
+            )
+        }
+        Text(
+
+            text = stringResource(R.string.errorTitle),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.White
+        )
+        Text(
+            modifier = Modifier.width(164.dp),
+            text = stringResource(R.string.errorDescription),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.White,
+            textAlign = TextAlign.Center
+        )
+        RedButton(
+            modifier = Modifier.padding(top = 35.dp),
+            text = stringResource(R.string.retry),
+            onClick = { onTryAgain() }
+        )
+
+    }
+}
+
+@Composable
+@Preview
+fun ErrorStatePreview() {
+    EventoriasTheme {
+        Box(Modifier.background(Color.Black)) {
+            ErrorState(
+                onTryAgain = { }
+            )
+        }
+    }
+}
 
 @Composable
 @Preview

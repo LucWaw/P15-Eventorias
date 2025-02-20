@@ -26,4 +26,8 @@
     <string name="event_List">Liste des événements</string>
     <string name="search_an_item">Recherchez parmi les événements</string>
     <string name="sort_event">Trier les événements par nom ou par date</string>
+    <string name="error">Icone d\'erreur</string>
+    <string name="errorTitle">Erreur</string>
+    <string name="errorDescription">Une erreur s\'est produite, veuillez réessayer plus tard</string>
+    <string name="retry">Réessayer</string>
 </resources>
