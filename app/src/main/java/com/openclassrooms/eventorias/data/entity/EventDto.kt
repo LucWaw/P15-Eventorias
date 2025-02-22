@@ -4,7 +4,7 @@ import com.openclassrooms.eventorias.domain.User
 import java.io.Serializable
 
 data class EventDto(
-    val id: String = "",
+    var id: String = "",
     val title: String = "",
     val description: String = "",
     val eventDate: Long = 0,

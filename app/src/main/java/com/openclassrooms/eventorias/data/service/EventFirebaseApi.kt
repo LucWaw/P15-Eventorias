@@ -1,6 +1,8 @@
 package com.openclassrooms.eventorias.data.service
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
@@ -21,9 +23,22 @@ class EventFirebaseApi {
             .orderBy("eventDate", Query.Direction.DESCENDING)
             .snapshots()
             .map { querySnapshot ->
-                querySnapshot.toObjects(EventDto::class.java).map {
-                    Event.fromDto(it)
+                querySnapshot.documents.map {
+                    val eventDto = it.toObject(EventDto::class.java)
+                    if (eventDto != null) {
+                        eventDto.id = it.id
+                    }
+                    if (eventDto != null) {
+                        Event.fromDto(eventDto)
+                    } else {
+                        throw RuntimeException("Failed to convert the task result to a EventDto object")
+                    }
                 }
             }
+    }
+
+    fun getPost(eventId: String): Task<DocumentSnapshot> {
+        return getEventCollection().document(eventId).get()
+
     }
 }

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 
 class HomeFeedViewModel(private val eventRepository: EventRepository) : ViewModel() {
-    private val _state: MutableStateFlow<EventListState> = MutableStateFlow(EventListState())
+    private val _state: MutableStateFlow<EventListState> = MutableStateFlow(EventListState(isLoading = true))
     val state: StateFlow<EventListState>
         get() = _state
 

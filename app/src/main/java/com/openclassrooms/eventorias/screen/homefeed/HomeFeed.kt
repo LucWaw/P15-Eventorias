@@ -75,6 +75,7 @@ import java.time.LocalTime
 @Composable
 fun HomeFeedScreen(
     modifier: Modifier = Modifier,
+    onPostClick: (String) -> Unit,
     viewModel: HomeFeedViewModel = koinViewModel(),
 ) {
     val scope = rememberCoroutineScope()
@@ -163,20 +164,20 @@ fun HomeFeedScreen(
             )
         } else {
 
-            HomeFeed(modifier = Modifier.padding(innerPadding), state.event)
+            HomeFeed(modifier = Modifier.padding(innerPadding), state.event, onPostClick)
 
         }
     }
 }
 
 @Composable
-fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>) {
+fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>, onPostClick: (String) -> Unit) {
     LazyColumn(
         modifier = modifier.padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(items) { event ->
-            EventCell(event = event)
+            EventCell(event = event, onPostClick = onPostClick)
         }
     }
 }
@@ -184,7 +185,8 @@ fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>) {
 @Composable
 fun EventCell(
     modifier: Modifier = Modifier,
-    event: Event
+    event: Event,
+    onPostClick: (String) -> Unit
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -193,7 +195,7 @@ fun EventCell(
         modifier = modifier
             .height(80.dp)
             .fillMaxWidth(),
-        onClick = { /* TODO */ }
+        onClick = { onPostClick(event.id) }
     ) {
         Row(
             modifier = Modifier
@@ -334,7 +336,8 @@ fun EventCellPreview() {
                 "Location 1",
                 "https://picsum.photos/id/80/1080/",
                 User("1", "Gerry", "https://picsum.photos/id/80/1080/"),
-            )
+            ),
+            onPostClick = { }
         )
     }
 }

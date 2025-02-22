@@ -10,6 +10,8 @@ sealed class Screen(
 ) {
     data object Home : Screen("home")
 
+    data object Detail : Screen("detail", navArguments = listOf(navArgument("eventId") { type = NavType.StringType }))
+
     data object Profile : Screen("profile")
 
     data object Auth : Screen("auth")

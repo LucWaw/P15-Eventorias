@@ -31,6 +31,7 @@ import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
 import com.openclassrooms.eventorias.screen.Screen
 import com.openclassrooms.eventorias.screen.component.WhiteButton
+import com.openclassrooms.eventorias.screen.detail.DetailScreen
 import com.openclassrooms.eventorias.screen.homefeed.HomeFeedScreen
 import com.openclassrooms.eventorias.screen.login.createaccountwithmail.CreateAccountWithMailScreen
 import com.openclassrooms.eventorias.screen.login.loginproviders.LoginProvidersScreen
@@ -38,20 +39,24 @@ import com.openclassrooms.eventorias.screen.login.loginwithpassword.LoginWithPas
 import com.openclassrooms.eventorias.screen.login.recoveraccountwithmail.RecoverAccountWithMailScreen
 import com.openclassrooms.eventorias.ui.theme.BlackBackground
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
+import org.koin.compose.KoinContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val navController = rememberNavController()
+            KoinContext {
+                val navController = rememberNavController()
 
-            EventoriasTheme {
-                BottomNavigation(navController) {
-                    EventoriasNavHost(navController, it)
+                EventoriasTheme {
+                    BottomNavigation(navController) {
+                        EventoriasNavHost(navController, it)
+                    }
+
                 }
-
             }
+
         }
     }
 
@@ -196,7 +201,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable(Screen.Home.route) {
-                HomeFeedScreen()
+                HomeFeedScreen(onPostClick = {
+                    navHostController.navigate("${Screen.Detail.route}/${it}")
+                })
+            }
+            composable(
+                route = "${Screen.Detail.route}/{eventId}",
+                arguments = Screen.Detail.navArguments
+            ) { backStackEntry ->
+                val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
+                DetailScreen(
+                    eventId = eventId,
+                    onBackClick = { navHostController.navigateUp() }
+                )
             }
             composable(Screen.Profile.route) {
                 Text(
@@ -211,4 +228,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
 }

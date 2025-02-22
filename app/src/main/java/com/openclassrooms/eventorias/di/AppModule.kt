@@ -6,6 +6,7 @@ import com.openclassrooms.eventorias.screen.login.loginwithpassword.LoginWithPas
 import com.openclassrooms.eventorias.screen.login.recoveraccountwithmail.RecoverAccountWithMailViewModel
 import com.openclassrooms.eventorias.screen.login.loginproviders.LoginProvidersViewModel
 import com.openclassrooms.eventorias.screen.homefeed.HomeFeedViewModel
+import com.openclassrooms.eventorias.screen.detail.DetailViewModel
 import com.openclassrooms.eventorias.data.EventRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -18,6 +19,7 @@ val appModule = module {
     singleOf(::UserRepository)
 
     viewModelOf(::CreateAccountWithMailViewModel)
+    viewModelOf(::DetailViewModel)
     viewModelOf(::LoginWithPasswordViewModel)
     viewModelOf(::RecoverAccountWithMailViewModel)
     viewModelOf(::LoginProvidersViewModel)
