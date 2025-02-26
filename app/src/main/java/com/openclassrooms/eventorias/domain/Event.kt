@@ -16,6 +16,8 @@ data class Event(
     val eventDate: LocalDate = LocalDate.now(),
     val eventHours: LocalTime = LocalTime.now(),
     val eventLocation: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
     val photoUrl: String? = null,
     val author: User = User()
 ) {
@@ -26,6 +28,8 @@ data class Event(
         eventDate = eventDate.toEpochDay(),
         eventHours = eventHours.toSecondOfDay(),
         eventLocation = eventLocation,
+        latitude = latitude,
+        longitude = longitude,
         photoUrl = photoUrl,
         author = author
     )
@@ -38,6 +42,8 @@ data class Event(
             eventDate = LocalDate.ofEpochDay(dto.eventDate),
             eventHours = LocalTime.ofSecondOfDay(dto.eventHours.toLong()),
             eventLocation = dto.eventLocation,
+            latitude = dto.latitude,
+            longitude = dto.longitude,
             photoUrl = dto.photoUrl,
             author = dto.author
         )

@@ -334,6 +334,8 @@ fun EventCellPreview() {
                 LocalDate.of(2021, 1, 25),
                 LocalTime.of(10, 0),
                 "Location 1",
+                40.7128,
+                74.0060,
                 "https://picsum.photos/id/80/1080/",
                 User("1", "Gerry", "https://picsum.photos/id/80/1080/"),
             ),

@@ -10,6 +10,8 @@ data class EventDto(
     val eventDate: Long = 0,
     val eventHours: Int = 0,
     val eventLocation: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
     val photoUrl: String? = null,
     val author: User = User()
 ) : Serializable

@@ -1,5 +1,9 @@
 package com.openclassrooms.eventorias.screen.detail
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,9 +50,12 @@ import com.openclassrooms.eventorias.domain.User
 import com.openclassrooms.eventorias.extension.LocalDateExt.Companion.toHumanDate
 import com.openclassrooms.eventorias.extension.LocalTimeExt.Companion.toHumanTime
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,15 +165,19 @@ fun Detail(event: Event, modifier: Modifier = Modifier) {
             }
         }
         Text(text = event.description)
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = event.eventLocation, modifier = Modifier.width(167.dp))
+
             AsyncImage(
                 modifier = Modifier
-                    .width(149.dp).height(72.dp).clip(RoundedCornerShape(12.dp)),
-                model = "https://maps.googleapis.com/maps/api/staticmap?language=en&center=${event.eventLocation}&zoom=18&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284&key=${BuildConfig.MAPS_API_KEY}",
+                    .width(149.dp)
+                    .height(72.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                model = "https://maps.googleapis.com/maps/api/staticmap?language=en&center=${event.latitude},${event.longitude}&zoom=18&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284&key=${BuildConfig.MAPS_API_KEY}",
                 imageLoader = LocalContext.current.imageLoader.newBuilder()
                     .logger(DebugLogger())
                     .build(),
@@ -178,6 +189,38 @@ fun Detail(event: Event, modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
+suspend fun getLatitudeAndLongitudeFromAddressName(
+    context: Context,
+    address: String
+): Pair<Double, Double>? {
+    val geocoder = Geocoder(context, Locale.getDefault())
+    return suspendCancellableCoroutine { continuation ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocationName(
+                address, 1,
+                object : Geocoder.GeocodeListener {
+                    override fun onGeocode(addresses: MutableList<Address>) {
+                        if (addresses.isNotEmpty()) {
+                            val firstAddress = addresses[0]
+                            val latitude = firstAddress.latitude
+                            val longitude = firstAddress.longitude
+                            continuation.resume(Pair(latitude, longitude), onCancellation = null)
+                        } else {
+                            continuation.resume(null, onCancellation = null)
+                        }
+                    }
+
+                    override fun onError(errorMessage: String?) {
+                        super.onError(errorMessage)
+                        continuation.resume(null, onCancellation = null)
+                    }
+                })
+        } else {
+            continuation.resume(null, onCancellation = null)
+        }
+    }
+}
 
 //PREVIEW
 @Preview
@@ -192,6 +235,8 @@ fun DetailScreenPreview() {
                 LocalDate.of(2021, 1, 25),
                 LocalTime.of(10, 0),
                 "Location 1",
+                48.8566,
+                2.3522,
                 "https://picsum.photos/id/80/1080/",
                 User("1", "Gerry", "https://picsum.photos/id/80/1080/"),
             )
