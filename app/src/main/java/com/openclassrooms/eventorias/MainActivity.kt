@@ -96,6 +96,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             label = { Text(topLevelRoute.name) },
+                            enabled = Firebase.auth.currentUser != null,
                             selected = currentDestination?.route == topLevelRoute.route,
                             onClick = {
                                 navController.navigate(topLevelRoute.route) {
@@ -223,7 +224,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .padding(24.dp),
                     text = "Logout",
-                    onClick = { Firebase.auth.signOut() }
+                    onClick = { Firebase.auth.signOut()
+                        navHostController.navigate(Screen.Auth.route)
+                    }
                 )
             }
         }
