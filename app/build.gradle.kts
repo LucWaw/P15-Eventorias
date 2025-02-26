@@ -32,6 +32,12 @@ android {
             name = "WEB_ID",
             value = apiKey
         )
+        val mapsKey = properties.getProperty("MAPS_API_KEY") ?: ""
+        buildConfigField(
+            type = "String",
+            name = "MAPS_API_KEY",
+            value = mapsKey
+        )
     }
 
     buildTypes {

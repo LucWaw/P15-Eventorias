@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -36,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.util.DebugLogger
+import com.openclassrooms.eventorias.BuildConfig
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
@@ -154,12 +158,22 @@ fun Detail(event: Event, modifier: Modifier = Modifier) {
             }
         }
         Text(text = event.description)
-        Row(
+        Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = event.eventLocation)
-            //TODO MAP
+            Text(text = event.eventLocation, modifier = Modifier.width(167.dp))
+            AsyncImage(
+                modifier = Modifier
+                    .width(149.dp).height(72.dp).clip(RoundedCornerShape(12.dp)),
+                model = "https://maps.googleapis.com/maps/api/staticmap?language=en&center=${event.eventLocation}&zoom=18&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284&key=${BuildConfig.MAPS_API_KEY}",
+                imageLoader = LocalContext.current.imageLoader.newBuilder()
+                    .logger(DebugLogger())
+                    .build(),
+                placeholder = ColorPainter(Color.DarkGray),
+                contentDescription = "Maps from the location",
+                contentScale = ContentScale.Crop,
+            )
         }
     }
 }
