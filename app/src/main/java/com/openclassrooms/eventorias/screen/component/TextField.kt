@@ -98,7 +98,7 @@ fun CustomPasswordTextField(
             val description = if (passwordVisible) "Hide password" else "Show password"
 
             IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                Icon(painter = image, description)
+                Icon(painter = image, description, tint = Color.White)
             }
         }
     )

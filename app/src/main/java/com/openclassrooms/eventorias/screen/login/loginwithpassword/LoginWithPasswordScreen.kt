@@ -32,6 +32,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.AuthResult
 import com.openclassrooms.eventorias.R
+import com.openclassrooms.eventorias.screen.component.CustomPasswordTextField
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.screen.component.RedButton
 import com.openclassrooms.eventorias.screen.component.WhiteButton
@@ -105,7 +106,7 @@ fun LoginWithPassword(
             )
         }
 
-        CustomTextField(
+        CustomPasswordTextField(
             value = passwordLocal,
             onValueChange = { passwordLocal = it },
             label = stringResource(R.string.password),
