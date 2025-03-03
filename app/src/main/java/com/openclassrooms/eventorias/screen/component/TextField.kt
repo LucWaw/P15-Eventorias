@@ -31,6 +31,7 @@ import com.openclassrooms.eventorias.ui.theme.GreySuperLight
 fun CustomTextField(
     modifier: Modifier = Modifier,
     value: String,
+    placeholder: String = "",
     onValueChange: (String) -> Unit,
     label: String,
 ) {
@@ -47,13 +48,17 @@ fun CustomTextField(
             unfocusedTextColor = GreySuperLight,
             focusedTextColor = GreySuperLight,
             disabledTextColor = GreySuperLight,
+            unfocusedPlaceholderColor = GreySuperLight,
+            focusedPlaceholderColor = GreySuperLight,
+            disabledPlaceholderColor = GreySuperLight,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
         ),
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) }
+        label = { Text(label) },
+        placeholder = { Text(placeholder) }
     )
 
 }

@@ -34,4 +34,7 @@
     <string name="profile">Profile</string>
     <string name="contentDescription_go_back">Retour</string>
     <string name="creation_of_an_event">Création d\'un événement</string>
+    <string name="title">Titre</string>
+    <string name="time">Heure</string>
+    <string name="address">Adresse</string>
 </resources>

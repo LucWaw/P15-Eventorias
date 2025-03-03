@@ -30,6 +30,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
 import com.openclassrooms.eventorias.screen.Screen
+import com.openclassrooms.eventorias.screen.addevent.AddEventScreen
 import com.openclassrooms.eventorias.screen.component.WhiteButton
 import com.openclassrooms.eventorias.screen.detail.DetailScreen
 import com.openclassrooms.eventorias.screen.homefeed.HomeFeedScreen
@@ -204,7 +205,10 @@ class MainActivity : ComponentActivity() {
             composable(Screen.Home.route) {
                 HomeFeedScreen(onPostClick = {
                     navHostController.navigate("${Screen.Detail.route}/${it}")
-                })
+                }, onAddClick = {
+                    navHostController.navigate(Screen.AddEvent.route)
+                }
+                )
             }
             composable(
                 route = "${Screen.Detail.route}/{eventId}",
@@ -224,11 +228,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .padding(24.dp),
                     text = "Logout",
-                    onClick = { Firebase.auth.signOut()
+                    onClick = {
+                        Firebase.auth.signOut()
                         navHostController.navigate(Screen.Auth.route)
                     }
                 )
             }
+            composable(Screen.AddEvent.route) {
+                AddEventScreen(
+                    onBackClick = { navHostController.navigateUp() }
+                )
+            }
+            
         }
     }
 

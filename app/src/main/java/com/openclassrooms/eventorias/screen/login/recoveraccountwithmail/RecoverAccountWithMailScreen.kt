@@ -70,7 +70,7 @@ fun RecoverAccountWithMailScreen(
 }
 
 @Composable
-fun RecoverAccountWithMail(
+private fun RecoverAccountWithMail(
     modifier: Modifier = Modifier,
     onRecover: () -> Unit,
     onError: () -> Unit,

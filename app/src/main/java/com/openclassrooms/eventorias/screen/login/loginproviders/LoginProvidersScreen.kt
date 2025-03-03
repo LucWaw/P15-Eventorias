@@ -55,7 +55,7 @@ fun LoginProvidersScreen(
 }
 
 @Composable
-fun LoginProviders(
+private fun LoginProviders(
     modifier: Modifier = Modifier,
     onMailClick: () -> Unit,
     onGoogleSignIn: () -> Unit,
@@ -93,7 +93,7 @@ fun LoginProviders(
 
 }
 
-suspend fun signInWithGoogle(
+private suspend fun signInWithGoogle(
     context: Context,
     onGoogleSignIn: () -> Unit,
     loginWithGoogle: (Credential) -> Task<AuthResult>

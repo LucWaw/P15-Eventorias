@@ -33,4 +33,7 @@
     <string name="profile">Profile</string>
     <string name="contentDescription_go_back">Go back</string>
     <string name="creation_of_an_event">Creation of an event</string>
+    <string name="title">Title</string>
+    <string name="time">Time</string>
+    <string name="address">Address</string>
 </resources>

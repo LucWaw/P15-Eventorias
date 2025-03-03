@@ -1,9 +1,5 @@
 package com.openclassrooms.eventorias.screen.detail
 
-import android.content.Context
-import android.location.Address
-import android.location.Geocoder
-import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,12 +46,9 @@ import com.openclassrooms.eventorias.domain.User
 import com.openclassrooms.eventorias.extension.LocalDateExt.Companion.toHumanDate
 import com.openclassrooms.eventorias.extension.LocalTimeExt.Companion.toHumanTime
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,7 +89,7 @@ fun DetailScreen(
 }
 
 @Composable
-fun Detail(event: Event, modifier: Modifier = Modifier) {
+private fun Detail(event: Event, modifier: Modifier = Modifier) {
     val scroll = rememberScrollState()
     Column(
         modifier = modifier
@@ -189,38 +182,6 @@ fun Detail(event: Event, modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun getLatitudeAndLongitudeFromAddressName(
-    context: Context,
-    address: String
-): Pair<Double, Double>? {
-    val geocoder = Geocoder(context, Locale.getDefault())
-    return suspendCancellableCoroutine { continuation ->
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            geocoder.getFromLocationName(
-                address, 1,
-                object : Geocoder.GeocodeListener {
-                    override fun onGeocode(addresses: MutableList<Address>) {
-                        if (addresses.isNotEmpty()) {
-                            val firstAddress = addresses[0]
-                            val latitude = firstAddress.latitude
-                            val longitude = firstAddress.longitude
-                            continuation.resume(Pair(latitude, longitude), onCancellation = null)
-                        } else {
-                            continuation.resume(null, onCancellation = null)
-                        }
-                    }
-
-                    override fun onError(errorMessage: String?) {
-                        super.onError(errorMessage)
-                        continuation.resume(null, onCancellation = null)
-                    }
-                })
-        } else {
-            continuation.resume(null, onCancellation = null)
-        }
-    }
-}
 
 //PREVIEW
 @Preview

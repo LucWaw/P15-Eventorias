@@ -69,7 +69,7 @@ fun LoginWithPasswordScreen(
 }
 
 @Composable
-fun LoginWithPassword(
+private fun LoginWithPassword(
     modifier: Modifier = Modifier,
     onLogInClick: () -> Unit,
     onRecoverClick: (String) -> Unit,

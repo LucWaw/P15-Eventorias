@@ -65,7 +65,7 @@ fun CreateAccountWithMailScreen(
 }
 
 @Composable
-fun CreateAccountWithMail(
+private fun CreateAccountWithMail(
     modifier: Modifier = Modifier,
     onLogin: () -> Unit,
     createAccount: (String, String, String) -> Task<AuthResult>, onError: () -> Unit,

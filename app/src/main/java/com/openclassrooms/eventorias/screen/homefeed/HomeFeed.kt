@@ -76,6 +76,7 @@ import java.time.LocalTime
 fun HomeFeedScreen(
     modifier: Modifier = Modifier,
     onPostClick: (String) -> Unit,
+    onAddClick: () -> Unit,
     viewModel: HomeFeedViewModel = koinViewModel(),
 ) {
     val scope = rememberCoroutineScope()
@@ -138,7 +139,7 @@ fun HomeFeedScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { onAddClick() },
             ) {
                 Icon(Icons.Filled.Add, stringResource(R.string.add_a_event))
             }
@@ -171,7 +172,7 @@ fun HomeFeedScreen(
 }
 
 @Composable
-fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>, onPostClick: (String) -> Unit) {
+private fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>, onPostClick: (String) -> Unit) {
     LazyColumn(
         modifier = modifier.padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -183,7 +184,7 @@ fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>, onPostClick: (St
 }
 
 @Composable
-fun EventCell(
+private fun EventCell(
     modifier: Modifier = Modifier,
     event: Event,
     onPostClick: (String) -> Unit
@@ -268,7 +269,7 @@ fun EventCell(
 
 
 @Composable
-fun ErrorState(modifier: Modifier = Modifier, onTryAgain: () -> Unit) {
+private fun ErrorState(modifier: Modifier = Modifier, onTryAgain: () -> Unit) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.fillMaxSize()) {
         Box(

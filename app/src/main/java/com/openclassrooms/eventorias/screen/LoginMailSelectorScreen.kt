@@ -51,7 +51,7 @@ fun LoginMailSelectorScreen(
 }
 
 @Composable
-fun LoginMailSelector(
+private fun LoginMailSelector(
     modifier: Modifier = Modifier,
     onCreateAccountClick: () -> Unit,
     onLogInClick: () -> Unit
