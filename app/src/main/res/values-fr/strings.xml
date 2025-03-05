@@ -37,4 +37,8 @@
     <string name="title">Titre</string>
     <string name="time">Heure</string>
     <string name="address">Adresse</string>
+    <string name="tap_here_to_enter_your_description">Tapez ici pour entrer votre description</string>
+    <string name="new_event">Nouvel événement</string>
+    <string name="enter_full_address">Saisir l\'adresse complète</string>
+    <string name="date_format">DD/MM/YYYY</string>
 </resources>

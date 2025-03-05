@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.openclassrooms.eventorias.data.UserRepository
-import com.openclassrooms.eventorias.extension.StringExt.Companion.isValidEmail
+import com.openclassrooms.eventorias.util.StringExt.Companion.isValidEmail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

@@ -1,12 +1,12 @@
-package com.openclassrooms.eventorias.extension
+package com.openclassrooms.eventorias.util
 
-import com.openclassrooms.eventorias.extension.LocalTimeExt.Companion.toHumanTime
+import com.openclassrooms.eventorias.util.TimeUtils.Companion.toHumanTime
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import java.time.LocalTime
 import java.util.Locale
 
-class LocalTimeExtTest {
+class TimeUtilsTest {
 
     @Test
     fun test() {

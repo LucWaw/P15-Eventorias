@@ -1,12 +1,12 @@
-package com.openclassrooms.eventorias.extension
+package com.openclassrooms.eventorias.util
 
-import com.openclassrooms.eventorias.extension.LocalDateExt.Companion.toHumanDate
+import com.openclassrooms.eventorias.util.DateUtils.Companion.toHumanDate
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import java.time.LocalDate
 import java.util.Locale
 
-class LocalDateExtTest{
+class DateUtilsTest{
     @Test
     fun test(){
         // Given

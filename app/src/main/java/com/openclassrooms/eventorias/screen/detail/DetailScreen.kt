@@ -43,8 +43,8 @@ import com.openclassrooms.eventorias.BuildConfig
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
-import com.openclassrooms.eventorias.extension.LocalDateExt.Companion.toHumanDate
-import com.openclassrooms.eventorias.extension.LocalTimeExt.Companion.toHumanTime
+import com.openclassrooms.eventorias.util.DateUtils.Companion.toHumanDate
+import com.openclassrooms.eventorias.util.TimeUtils.Companion.toHumanTime
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate

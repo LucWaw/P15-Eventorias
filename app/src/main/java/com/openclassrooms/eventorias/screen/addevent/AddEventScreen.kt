@@ -27,6 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,8 +44,12 @@ import androidx.compose.ui.unit.dp
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
+import com.openclassrooms.eventorias.util.DateUtils.Companion.convertMillisToLocalDate
+import com.openclassrooms.eventorias.util.DateUtils.Companion.toHumanDate
+import com.openclassrooms.eventorias.util.TimeUtils.Companion.toHumanTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.time.LocalTime
 import java.util.Calendar
 import java.util.Locale
 
@@ -54,23 +59,23 @@ fun AddEventScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
     Scaffold(
         modifier = modifier,
         topBar =
-        {
-            TopAppBar(
-                title = {
-                    Text(stringResource(R.string.creation_of_an_event))
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        onBackClick()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.contentDescription_go_back)
-                        )
+            {
+                TopAppBar(
+                    title = {
+                        Text(stringResource(R.string.creation_of_an_event))
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            onBackClick()
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(id = R.string.contentDescription_go_back)
+                            )
+                        }
                     }
-                }
-            )
-        }
+                )
+            }
     ) { innerPadding ->
         AddEvent(modifier = Modifier.padding(innerPadding))
     }
@@ -114,6 +119,15 @@ suspend fun getLatitudeAndLongitudeFromAddressName(
 private fun AddEvent(modifier: Modifier = Modifier) {
     var description by remember { mutableStateOf("") }
     var descriptionisFocused by remember { mutableStateOf(false) }
+
+    var title by remember { mutableStateOf("") }
+    var titleisFocused by remember { mutableStateOf(false) }
+
+
+
+    var address by remember { mutableStateOf("") }
+    var addressisFocused by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -121,14 +135,21 @@ private fun AddEvent(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         CustomTextField(
-            value = "",
-            onValueChange = {},
+            value = if (title.isEmpty() && !titleisFocused) {
+                stringResource(R.string.new_event)
+            } else {
+                title
+            },
+            onValueChange = { title = it },
             label = stringResource(R.string.title),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { titleisFocused = it.isFocused }
+
         )
         CustomTextField(
             value = if (description.isEmpty() && !descriptionisFocused) {
-                "Tap here to enter your description"//TODO extract string ressource and put to other fields
+                stringResource(R.string.tap_here_to_enter_your_description)
             } else {
                 description
             },
@@ -143,13 +164,7 @@ private fun AddEvent(modifier: Modifier = Modifier) {
         var selectedTime: TimePickerState? by remember { mutableStateOf(null) }
 
         var showDialWithDateDialog by remember { mutableStateOf(false) }
-        val selectedDate: DatePickerState by remember {
-            mutableStateOf(
-                DatePickerState(
-                    locale = Locale.getDefault()
-                )
-            )
-        }
+        val selectedDate: DatePickerState = rememberDatePickerState()
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Box(
@@ -158,7 +173,9 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     .weight(1f)
             ) {
                 CustomTextField(
-                    value = "",
+                    value = selectedDate.selectedDateMillis?.let { convertMillisToLocalDate(it).toHumanDate() } ?: stringResource(
+                        R.string.date_format
+                    ),
                     onValueChange = {},
                     label = "Date",
                     modifier = Modifier.fillMaxWidth()
@@ -179,7 +196,7 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     .weight(1f)
             ) {
                 CustomTextField(
-                    value = "",
+                    value = selectedTime?.let { LocalTime.of(it.hour, it.minute).toHumanTime() } ?: "HH : MM",
                     onValueChange = {},
                     label = stringResource(R.string.time),
                     modifier = Modifier.fillMaxWidth()
@@ -196,10 +213,17 @@ private fun AddEvent(modifier: Modifier = Modifier) {
 
         }
         CustomTextField(
-            value = "",
-            onValueChange = {},
+            value = if (address.isEmpty() && !addressisFocused) {
+                stringResource(R.string.enter_full_address)
+            } else {
+                address
+            },
+            onValueChange = { address = it },
             label = stringResource(R.string.address),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { addressisFocused = it.isFocused }
+
         )
 
         if (showDialWithDateDialog) {
@@ -209,13 +233,13 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     showDialWithDateDialog = false
                 },
                 confirmButton =
-                {
-                    TextButton(onClick = {
-                        showDialWithDateDialog = false
-                    }) {
-                        Text("OK")
-                    }
-                },
+                    {
+                        TextButton(onClick = {
+                            showDialWithDateDialog = false
+                        }) {
+                            Text("OK")
+                        }
+                    },
 
                 ) {
                 //All text Color in white
@@ -262,12 +286,14 @@ fun DialWithTimeDialog(
     val timePickerState = rememberTimePickerState(
         initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
         initialMinute = currentTime.get(Calendar.MINUTE),
-        is24Hour = true,
+        is24Hour = Locale.getDefault().language == "fr"
     )
 
     TimePickerDialog(
         onDismiss = { onDismiss() },
-        onConfirm = { onConfirm(timePickerState) }
+        onConfirm = { onConfirm(timePickerState)
+
+        }
     ) {
         TimePicker(
             state = timePickerState,

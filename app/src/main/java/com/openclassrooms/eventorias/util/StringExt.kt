@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.extension
+package com.openclassrooms.eventorias.util
 
 import androidx.core.util.PatternsCompat
 

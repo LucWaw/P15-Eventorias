@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.tasks.Task
 import com.openclassrooms.eventorias.data.UserRepository
-import com.openclassrooms.eventorias.extension.StringExt.Companion.isValidEmail
+import com.openclassrooms.eventorias.util.StringExt.Companion.isValidEmail
 import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormError
 import com.openclassrooms.eventorias.screen.login.createaccountwithmail.FormEvent
 import com.openclassrooms.eventorias.screen.login.createaccountwithmail.UserVerfication

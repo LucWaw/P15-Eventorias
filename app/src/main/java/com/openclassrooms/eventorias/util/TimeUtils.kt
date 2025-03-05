@@ -1,10 +1,10 @@
-package com.openclassrooms.eventorias.extension
+package com.openclassrooms.eventorias.util
 
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class LocalTimeExt {
+class TimeUtils {
     companion object {
         /**
          * Converts a LocalTime object to a human-readable time string.
@@ -26,5 +26,9 @@ class LocalTimeExt {
                 else -> this.toString()
             }
         }
+
+        /**
+         * Convert a int hours, int minutes to a hum
+         */
     }
 }
