@@ -28,7 +28,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.openclassrooms.eventorias.screen.LoginMailSelectorScreen
+import com.openclassrooms.eventorias.screen.login.LoginMailSelectorScreen
 import com.openclassrooms.eventorias.screen.Screen
 import com.openclassrooms.eventorias.screen.addevent.AddEventScreen
 import com.openclassrooms.eventorias.screen.component.WhiteButton

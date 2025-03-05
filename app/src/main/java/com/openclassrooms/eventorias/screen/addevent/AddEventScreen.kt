@@ -124,7 +124,6 @@ private fun AddEvent(modifier: Modifier = Modifier) {
     var titleisFocused by remember { mutableStateOf(false) }
 
 
-
     var address by remember { mutableStateOf("") }
     var addressisFocused by remember { mutableStateOf(false) }
 
@@ -161,7 +160,13 @@ private fun AddEvent(modifier: Modifier = Modifier) {
 
         )
         var showDialWithTimeDialog by remember { mutableStateOf(false) }
-        var selectedTime: TimePickerState? by remember { mutableStateOf(null) }
+        val currentTime = Calendar.getInstance()
+        val selectedTime = rememberTimePickerState(
+            initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
+            initialMinute = currentTime.get(Calendar.MINUTE),
+            is24Hour = Locale.getDefault().language == "fr"
+        )
+        var selectedTimeShouldBeDisplayed by remember { mutableStateOf(false) }
 
         var showDialWithDateDialog by remember { mutableStateOf(false) }
         val selectedDate: DatePickerState = rememberDatePickerState()
@@ -173,9 +178,10 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     .weight(1f)
             ) {
                 CustomTextField(
-                    value = selectedDate.selectedDateMillis?.let { convertMillisToLocalDate(it).toHumanDate() } ?: stringResource(
-                        R.string.date_format
-                    ),
+                    value = selectedDate.selectedDateMillis?.let { convertMillisToLocalDate(it).toHumanDate() }
+                        ?: stringResource(
+                            R.string.date_format
+                        ),
                     onValueChange = {},
                     label = "Date",
                     modifier = Modifier.fillMaxWidth()
@@ -196,7 +202,11 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     .weight(1f)
             ) {
                 CustomTextField(
-                    value = selectedTime?.let { LocalTime.of(it.hour, it.minute).toHumanTime() } ?: "HH : MM",
+                    value = if (selectedTimeShouldBeDisplayed) {
+                        LocalTime.of(selectedTime.hour, selectedTime.minute).toHumanTime()
+                    } else {
+                        "HH : MM"
+                    },
                     onValueChange = {},
                     label = stringResource(R.string.time),
                     modifier = Modifier.fillMaxWidth()
@@ -209,6 +219,7 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                             showDialWithTimeDialog = true
                         }),
                 )
+
             }
 
         }
@@ -264,10 +275,11 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                 onDismiss = {
                     showDialWithTimeDialog = false
                 },
-                onConfirm = { time ->
-                    selectedTime = time
+                onConfirm = {
                     showDialWithTimeDialog = false
+                    selectedTimeShouldBeDisplayed = true
                 },
+                timePickerState = selectedTime
             )
         }
 
@@ -278,20 +290,14 @@ private fun AddEvent(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialWithTimeDialog(
-    onConfirm: (TimePickerState) -> Unit,
+    onConfirm: () -> Unit,
+    timePickerState: TimePickerState,
     onDismiss: () -> Unit,
 ) {
-    val currentTime = Calendar.getInstance()
-
-    val timePickerState = rememberTimePickerState(
-        initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-        initialMinute = currentTime.get(Calendar.MINUTE),
-        is24Hour = Locale.getDefault().language == "fr"
-    )
-
     TimePickerDialog(
         onDismiss = { onDismiss() },
-        onConfirm = { onConfirm(timePickerState)
+        onConfirm = {
+            onConfirm()
 
         }
     ) {
@@ -309,11 +315,6 @@ fun TimePickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        dismissButton = {
-            TextButton(onClick = { onDismiss() }) {
-                Text("Dismiss")
-            }
-        },
         confirmButton = {
             TextButton(onClick = { onConfirm() }) {
                 Text("OK")

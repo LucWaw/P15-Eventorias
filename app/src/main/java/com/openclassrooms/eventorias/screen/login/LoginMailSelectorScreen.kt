@@ -1,4 +1,4 @@
-package com.openclassrooms.eventorias.screen
+package com.openclassrooms.eventorias.screen.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
