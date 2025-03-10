@@ -1,16 +1,20 @@
 package com.openclassrooms.eventorias.screen.addevent
 
-import android.content.Context
-import android.location.Address
-import android.location.Geocoder
-import android.os.Build
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
@@ -19,8 +23,10 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,33 +40,45 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.screen.component.CustomTextField
+import com.openclassrooms.eventorias.screen.component.RedButton
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import com.openclassrooms.eventorias.util.DateUtils.Companion.convertMillisToLocalDate
 import com.openclassrooms.eventorias.util.DateUtils.Companion.toHumanDate
 import com.openclassrooms.eventorias.util.TimeUtils.Companion.toHumanTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
+import org.koin.compose.viewmodel.koinViewModel
+import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Calendar
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEventScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
+fun AddEventScreen(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+    viewModel: AddEventViewModel = koinViewModel()
+) {
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         modifier = modifier,
         topBar =
             {
                 TopAppBar(
+                    windowInsets = WindowInsets(0.dp),
                     title = {
                         Text(stringResource(R.string.creation_of_an_event))
                     },
@@ -77,55 +95,70 @@ fun AddEventScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
                 )
             }
     ) { innerPadding ->
-        AddEvent(modifier = Modifier.padding(innerPadding))
+        val post by viewModel.post.collectAsStateWithLifecycle()
+        val error by viewModel.error.collectAsStateWithLifecycle()
+        val uriImage by viewModel.uriImage.collectAsStateWithLifecycle()
+        val pickMedia =
+            rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                // Callback is invoked after the user selects a media item or closes the
+                // photo picker.
+                if (uri != null) {
+                    Log.d("PhotoPicker", "Selected URI: $uri")
+                    viewModel.onAction(AddPostFormEvent.ImageChanged(uri))
+                } else {
+                    Log.d("PhotoPicker", "No media selected")
+                }
+            }
+        AddEvent(
+            modifier = Modifier.padding(innerPadding),
+            error = error,
+            title = post.title,
+            onTitleChanged = { viewModel.onAction(AddPostFormEvent.TitleChanged(it)) },
+            description = post.description,
+            onDescriptionChanged = { viewModel.onAction(AddPostFormEvent.DescriptionChanged(it)) },
+            date = post.eventDate,
+            onDateChanged = { viewModel.onAction(AddPostFormEvent.LocalDateChanged(it)) },
+            time = post.eventHours,
+            onTimeChanged = { viewModel.onAction(AddPostFormEvent.LocalTimeChanged(it)) },
+            address = post.eventLocation,
+            onAddressChanged = { viewModel.onAction(AddPostFormEvent.AddressChanged(it)) },
+            onSaveClicked = {
+                viewModel.addPost()?.addOnSuccessListener { onBackClick() }
+            },
+            openPhotoPicker = {
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            },
+            uriImage = uriImage
+
+        )
     }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun getLatitudeAndLongitudeFromAddressName(
-    context: Context,
-    address: String
-): Pair<Double, Double>? {
-    val geocoder = Geocoder(context, Locale.getDefault())
-    return suspendCancellableCoroutine { continuation ->
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            geocoder.getFromLocationName(
-                address, 1,
-                object : Geocoder.GeocodeListener {
-                    override fun onGeocode(addresses: MutableList<Address>) {
-                        if (addresses.isNotEmpty()) {
-                            val firstAddress = addresses[0]
-                            val latitude = firstAddress.latitude
-                            val longitude = firstAddress.longitude
-                            continuation.resume(Pair(latitude, longitude), onCancellation = null)
-                        } else {
-                            continuation.resume(null, onCancellation = null)
-                        }
-                    }
-
-                    override fun onError(errorMessage: String?) {
-                        super.onError(errorMessage)
-                        continuation.resume(null, onCancellation = null)
-                    }
-                })
-        } else {
-            continuation.resume(null, onCancellation = null)
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddEvent(modifier: Modifier = Modifier) {
-    var description by remember { mutableStateOf("") }
-    var descriptionisFocused by remember { mutableStateOf(false) }
+private fun AddEvent(
+    modifier: Modifier = Modifier,
+    error: AddPostFormError?,
+    title: String,
+    onTitleChanged: (String) -> Unit,
+    description: String,
+    onDescriptionChanged: (String) -> Unit,
+    date: LocalDate?,
+    onDateChanged: (LocalDate) -> Unit,
+    time: LocalTime?,
+    onTimeChanged: (LocalTime) -> Unit,
+    address: String,
+    onAddressChanged: (String) -> Unit,
+    onSaveClicked: () -> Unit,
+    openPhotoPicker: () -> Unit,
+    uriImage: Uri?
+) {
+    var descriptionIsFocused by remember { mutableStateOf(false) }
 
-    var title by remember { mutableStateOf("") }
-    var titleisFocused by remember { mutableStateOf(false) }
+    var titleIsFocused by remember { mutableStateOf(false) }
 
-
-    var address by remember { mutableStateOf("") }
-    var addressisFocused by remember { mutableStateOf(false) }
+    var addressIsFocused by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -134,29 +167,29 @@ private fun AddEvent(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         CustomTextField(
-            value = if (title.isEmpty() && !titleisFocused) {
+            value = if (title.isEmpty() && !titleIsFocused) {
                 stringResource(R.string.new_event)
             } else {
                 title
             },
-            onValueChange = { title = it },
+            onValueChange = { onTitleChanged(it) },
             label = stringResource(R.string.title),
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { titleisFocused = it.isFocused }
+                .onFocusChanged { titleIsFocused = it.isFocused }
 
         )
         CustomTextField(
-            value = if (description.isEmpty() && !descriptionisFocused) {
+            value = if (description.isEmpty() && !descriptionIsFocused) {
                 stringResource(R.string.tap_here_to_enter_your_description)
             } else {
                 description
             },
-            onValueChange = { description = it },
+            onValueChange = { onDescriptionChanged(it) },
             label = "Description",
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { descriptionisFocused = it.isFocused }
+                .onFocusChanged { descriptionIsFocused = it.isFocused }
 
         )
         var showDialWithTimeDialog by remember { mutableStateOf(false) }
@@ -166,7 +199,6 @@ private fun AddEvent(modifier: Modifier = Modifier) {
             initialMinute = currentTime.get(Calendar.MINUTE),
             is24Hour = Locale.getDefault().language == "fr"
         )
-        var selectedTimeShouldBeDisplayed by remember { mutableStateOf(false) }
 
         var showDialWithDateDialog by remember { mutableStateOf(false) }
         val selectedDate: DatePickerState = rememberDatePickerState()
@@ -178,7 +210,7 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     .weight(1f)
             ) {
                 CustomTextField(
-                    value = selectedDate.selectedDateMillis?.let { convertMillisToLocalDate(it).toHumanDate() }
+                    value = date?.toHumanDate()
                         ?: stringResource(
                             R.string.date_format
                         ),
@@ -202,11 +234,7 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     .weight(1f)
             ) {
                 CustomTextField(
-                    value = if (selectedTimeShouldBeDisplayed) {
-                        LocalTime.of(selectedTime.hour, selectedTime.minute).toHumanTime()
-                    } else {
-                        "HH : MM"
-                    },
+                    value = time?.toHumanTime() ?: "HH : MM",
                     onValueChange = {},
                     label = stringResource(R.string.time),
                     modifier = Modifier.fillMaxWidth()
@@ -223,19 +251,7 @@ private fun AddEvent(modifier: Modifier = Modifier) {
             }
 
         }
-        CustomTextField(
-            value = if (address.isEmpty() && !addressisFocused) {
-                stringResource(R.string.enter_full_address)
-            } else {
-                address
-            },
-            onValueChange = { address = it },
-            label = stringResource(R.string.address),
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { addressisFocused = it.isFocused }
 
-        )
 
         if (showDialWithDateDialog) {
 
@@ -246,6 +262,7 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                 confirmButton =
                     {
                         TextButton(onClick = {
+                            onDateChanged(convertMillisToLocalDate(selectedDate.selectedDateMillis!!)) // !! because on confirm : sure that selectedDate.selectedDateMillis is not null
                             showDialWithDateDialog = false
                         }) {
                             Text("OK")
@@ -276,12 +293,74 @@ private fun AddEvent(modifier: Modifier = Modifier) {
                     showDialWithTimeDialog = false
                 },
                 onConfirm = {
+                    onTimeChanged(it)
                     showDialWithTimeDialog = false
-                    selectedTimeShouldBeDisplayed = true
                 },
                 timePickerState = selectedTime
             )
         }
+
+        CustomTextField(
+            value = if (address.isEmpty() && !addressIsFocused) {
+                stringResource(R.string.enter_full_address)
+            } else {
+                address
+            },
+            onValueChange = { onAddressChanged(it) },
+            label = stringResource(R.string.address),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { addressIsFocused = it.isFocused }
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
+                space = 16.dp,
+                alignment = Alignment.CenterHorizontally
+            )
+        ) {
+            FloatingActionButton(
+                containerColor = Color.White,
+                onClick = { /*TODO*/ },
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.icon_photo),
+                    contentDescription = stringResource(R.string.take_a_picture),
+                    tint = Color.Unspecified
+                )
+            }
+
+            FloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
+                onClick = { openPhotoPicker() },
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.file_icon),
+                    contentDescription = stringResource(R.string.select_a_picture),
+                    tint = Color.Unspecified
+                )
+            }
+        }
+
+        AsyncImage(
+            model = uriImage,
+            contentDescription = stringResource(R.string.image_selected),
+            modifier = Modifier
+                .padding(4.dp)
+                .width(500.dp)
+                .heightIn(max = 200.dp)
+                .align(Alignment.CenterHorizontally),
+            contentScale = ContentScale.Crop,
+        )
+
+
+        RedButton(
+            modifier = Modifier
+                .fillMaxWidth(),
+            enabled = error == null,
+            onClick = { onSaveClicked() },
+            text = stringResource(R.string.action_save)
+        )
 
 
     }
@@ -290,14 +369,14 @@ private fun AddEvent(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialWithTimeDialog(
-    onConfirm: () -> Unit,
+    onConfirm: (LocalTime) -> Unit,
     timePickerState: TimePickerState,
     onDismiss: () -> Unit,
 ) {
     TimePickerDialog(
         onDismiss = { onDismiss() },
         onConfirm = {
-            onConfirm()
+            onConfirm(LocalTime.of(timePickerState.hour, timePickerState.minute))
 
         }
     ) {
@@ -328,6 +407,21 @@ fun TimePickerDialog(
 @Composable
 fun PreviewAddEvent() {
     EventoriasTheme {
-        AddEvent()
+        AddEvent(
+            error = null,
+            title = "Title",
+            onTitleChanged = {},
+            description = "Description",
+            onDescriptionChanged = {},
+            date = LocalDate.now(),
+            onDateChanged = {},
+            time = LocalTime.now(),
+            onTimeChanged = {},
+            address = "Address",
+            onAddressChanged = {},
+            onSaveClicked = {},
+            openPhotoPicker = {},
+            uriImage = null
+        )
     }
 }

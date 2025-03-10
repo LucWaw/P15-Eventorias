@@ -3,6 +3,7 @@ package com.openclassrooms.eventorias.screen.detail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -63,10 +65,12 @@ fun DetailScreen(
 
     }
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         modifier = modifier,
         topBar =
         {
             TopAppBar(
+                windowInsets = WindowInsets(0.dp),
                 title = {
                     Text(event.title)
                 },
@@ -102,7 +106,8 @@ private fun Detail(event: Event, modifier: Modifier = Modifier) {
             AsyncImage(
                 modifier = Modifier
                     .size(400.dp)
-                    .align(Alignment.CenterHorizontally),
+                    .align(Alignment.CenterHorizontally)
+                    .clip(MaterialTheme.shapes.medium),
                 model = event.photoUrl,
                 imageLoader = LocalContext.current.imageLoader.newBuilder()
                     .logger(DebugLogger())
@@ -129,7 +134,7 @@ private fun Detail(event: Event, modifier: Modifier = Modifier) {
                         painter = painterResource(id = R.drawable.date_icon),
                         contentDescription = "date icon",
                     )
-                    Text(text = event.eventDate.toHumanDate())
+                    event.eventDate?.let { Text(text = it.toHumanDate()) }
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -139,7 +144,7 @@ private fun Detail(event: Event, modifier: Modifier = Modifier) {
                         painter = painterResource(id = R.drawable.icon_hours),
                         contentDescription = "hours icon",
                     )
-                    Text(text = event.eventHours.toHumanTime())
+                    event.eventHours?.let { Text(text = it.toHumanTime()) }
                 }
             }
             if (!event.author.urlPicture.isNullOrEmpty()) {
@@ -183,7 +188,6 @@ private fun Detail(event: Event, modifier: Modifier = Modifier) {
 }
 
 
-//PREVIEW
 @Preview
 @Composable
 fun DetailScreenPreview() {

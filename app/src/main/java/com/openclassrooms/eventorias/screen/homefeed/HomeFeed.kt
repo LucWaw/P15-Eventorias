@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -84,11 +85,13 @@ fun HomeFeedScreen(
     val focusRequester = remember { FocusRequester() }
 
     Scaffold(modifier = modifier,
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             var showText by rememberSaveable { mutableStateOf(true) }
             var searchText by remember { mutableStateOf("") }
 
             TopAppBar(
+                windowInsets = WindowInsets(0.dp),
                 modifier = Modifier.padding(horizontal = 12.dp),
                 title = {
                     if (showText) {
@@ -165,7 +168,7 @@ fun HomeFeedScreen(
             )
         } else {
 
-            HomeFeed(modifier = Modifier.padding(innerPadding), state.event, onPostClick)
+            HomeFeed(modifier = Modifier.padding(innerPadding), items = state.event, onPostClick = onPostClick)
 
         }
     }
@@ -233,10 +236,13 @@ private fun EventCell(
                         style = MaterialTheme.typography.bodyLarge,
                         color = GreySuperLight
                     )
-                    Text(
-                        text = event.eventDate.toHumanDate(),
-                        color = GreyDate
-                    )
+
+                    event.eventDate?.let {
+                        Text(
+                            text = it.toHumanDate(),
+                            color = GreyDate
+                        )
+                    }
 
                 }
             }

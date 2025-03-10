@@ -40,4 +40,13 @@
     <string name="new_event">New event</string>
     <string name="enter_full_address">Enter full address</string>
     <string name="date_format">MM/DD/YYYY</string>
+    <string name="error_title">Title not valid</string>
+    <string name="error_description">Invalid description</string>
+    <string name="error_local_date">Invalid Date</string>
+    <string name="error_local_time">Invalid Time</string>
+    <string name="error_address">Invalid Address</string>
+    <string name="take_a_picture">Take a picture</string>
+    <string name="select_a_picture">Select a picture</string>
+    <string name="image_selected">Image selected</string>
+    <string name="action_save">Validate</string>
 </resources>

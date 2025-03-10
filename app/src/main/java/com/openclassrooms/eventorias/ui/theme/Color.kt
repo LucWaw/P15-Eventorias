@@ -2,7 +2,7 @@ package com.openclassrooms.eventorias.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Red = Color(0xFFFB0000)
+val Red = Color(0xFFD0021B)
 val White = Color(0xFFFFFFFF)
 val Grey = Color(0xFF49454F)
 val GreyLight = Color(0xFFCAC4D0)
