@@ -176,7 +176,17 @@ private fun AddEvent(
             label = stringResource(R.string.title),
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { titleIsFocused = it.isFocused }
+                .onFocusChanged { titleIsFocused = it.isFocused },
+            supportingText = if (error is AddPostFormError.TitleError) {
+                {
+                    Text(
+                        text = stringResource(id = error.messageRes),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            } else {
+                null
+            }
 
         )
         CustomTextField(
@@ -189,7 +199,17 @@ private fun AddEvent(
             label = "Description",
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { descriptionIsFocused = it.isFocused }
+                .onFocusChanged { descriptionIsFocused = it.isFocused },
+            supportingText = if (error is AddPostFormError.DescriptionError) {
+                {
+                    Text(
+                        text = stringResource(id = error.messageRes),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            } else {
+                null
+            }
 
         )
         var showDialWithTimeDialog by remember { mutableStateOf(false) }
@@ -216,7 +236,17 @@ private fun AddEvent(
                         ),
                     onValueChange = {},
                     label = "Date",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    supportingText = if (error is AddPostFormError.LocalDateError) {
+                        {
+                            Text(
+                                text = stringResource(id = error.messageRes),
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    } else {
+                        null
+                    }
                 )
                 Box(
                     modifier = Modifier
@@ -237,7 +267,17 @@ private fun AddEvent(
                     value = time?.toHumanTime() ?: "HH : MM",
                     onValueChange = {},
                     label = stringResource(R.string.time),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    supportingText = if (error is AddPostFormError.LocalTimeError) {
+                        {
+                            Text(
+                                text = stringResource(id = error.messageRes),
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    } else {
+                        null
+                    }
                 )
                 Box(
                     modifier = Modifier
@@ -310,7 +350,17 @@ private fun AddEvent(
             label = stringResource(R.string.address),
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { addressIsFocused = it.isFocused }
+                .onFocusChanged { addressIsFocused = it.isFocused },
+            supportingText = if (error is AddPostFormError.AddressError) {
+                {
+                    Text(
+                        text = stringResource(id = error.messageRes),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            } else {
+                null
+            }
         )
 
         Row(

@@ -34,6 +34,7 @@ fun CustomTextField(
     placeholder: String = "",
     onValueChange: (String) -> Unit,
     label: String,
+    supportingText: @Composable (() -> Unit)? = null
 ) {
     TextField(
         modifier = modifier,
@@ -58,7 +59,8 @@ fun CustomTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        placeholder = { Text(placeholder) }
+        placeholder = { Text(placeholder) },
+        supportingText = supportingText
     )
 
 }

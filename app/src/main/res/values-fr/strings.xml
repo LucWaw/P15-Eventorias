@@ -41,11 +41,11 @@
     <string name="new_event">Nouvel événement</string>
     <string name="enter_full_address">Saisir l\'adresse complète</string>
     <string name="date_format">DD/MM/YYYY</string>
-    <string name="error_title">Titre non valide</string>
-    <string name="error_description">Description non valide</string>
-    <string name="error_local_date">Date non valide</string>
-    <string name="error_local_time">Heure non valide</string>
-    <string name="error_address">Adresse non valide</string>
+    <string name="error_title">Veuillez entrer un titre</string>
+    <string name="error_description">Veuillez entrer une description</string>
+    <string name="error_local_date">Veuillez sélectionner une date</string>
+    <string name="error_local_time">Veuillez sélectionner une heure</string>
+    <string name="error_address">Veuillez entrer une adresse</string>
     <string name="take_a_picture">Prendre une photo</string>
     <string name="select_a_picture">Séléctionnner une photo</string>
     <string name="image_selected">Image sélectionné</string>
