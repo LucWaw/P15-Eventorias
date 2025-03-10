@@ -230,7 +230,12 @@ class MainActivity : ComponentActivity() {
                     text = "Logout",
                     onClick = {
                         Firebase.auth.signOut()
-                        navHostController.navigate(Screen.Auth.route)
+                        //navigate to login screen and clear backstack
+                        navHostController.navigate(Screen.Auth.route) {
+                            popUpTo(Screen.Home.route) {
+                                inclusive = true
+                            }
+                        }
                     }
                 )
             }
