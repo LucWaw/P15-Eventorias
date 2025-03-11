@@ -50,4 +50,7 @@
     <string name="image_selected">Image selected</string>
     <string name="action_save">Validate</string>
     <string name="error_saving_post">Error while saving the event</string>
+    <string name="user_profile">User profile</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="delete_account">Delete Account</string>
 </resources>

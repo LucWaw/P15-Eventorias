@@ -51,4 +51,7 @@
     <string name="image_selected">Image sélectionné</string>
     <string name="action_save">Valider</string>
     <string name="error_saving_post">Erreur lors de l\'enregistrement de l\'événement</string>
+    <string name="user_profile">Profil utilisateur</string>
+    <string name="sign_out">Se Déconnecter</string>
+    <string name="delete_account">Supprimer Le compte</string>
 </resources>
