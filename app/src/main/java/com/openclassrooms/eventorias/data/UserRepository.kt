@@ -1,6 +1,5 @@
 package com.openclassrooms.eventorias.data
 
-import android.content.Context
 import android.util.Log
 import androidx.credentials.Credential
 import com.google.android.gms.tasks.Task
@@ -49,8 +48,14 @@ class UserRepository {
                                 if (user != null) {
                                     userAlreadyExist(user.uid).addOnSuccessListener { userExist ->
                                         if (!userExist) {
-                                            Log.d("GooGleSignIn", "User does not exist, create user")
-                                            createUser(user.displayName ?: "")
+                                            Log.d(
+                                                "GooGleSignIn",
+                                                "User does not exist, create user"
+                                            )
+                                            //Put display name and image url
+                                            createUser(user.displayName ?: "",
+                                                user.photoUrl?.toString()
+                                            )
                                         }
                                     }
                                 }
@@ -103,16 +108,24 @@ class UserRepository {
         return FirebaseAuth.getInstance().signOut()
     }
 
-    fun deleteUser(context: Context): Task<Void> {
-        return getCurrentUser()?.delete() ?: Tasks.forResult(null)
+    /**
+     * Delete the User from Firestore and Auth.
+     * @return Task<Void> The task to delete the user.
+     */
+    fun deleteUser(): Task<Void> {
+        // Delete user from Firestore
+        return deleteUserFromFirestore().addOnSuccessListener {
+            // Delete the user account from the Auth
+            getCurrentUser()?.delete()
+        }
     }
 
     // Create User in Firestore
-    private fun createUser(name: String) {
+    private fun createUser(name: String, photoUrl: String? = null) {
         val user = getCurrentUser()
         if (user != null) {
             val uid = user.uid
-            val userToCreate = User(uid, name)
+            val userToCreate = User(uid, name, photoUrl)
 
             getUsersCollection().document(uid).set(userToCreate)
         }
@@ -123,7 +136,7 @@ class UserRepository {
     }
 
     // Delete the User from Firestore
-    fun deleteUserFromFirestore(): Task<Void> {
+    private fun deleteUserFromFirestore(): Task<Void> {
         val uid: String? = getCurrentUserUID()
         if (uid != null) {
             return getUsersCollection().document(uid).delete()
@@ -132,10 +145,14 @@ class UserRepository {
     }
 
     // Get User Data from Firestore
-    fun getUserData(): Task<DocumentSnapshot>? {
+    fun getUserData(): Task<User>? {
         val uid: String? = getCurrentUserUID()
         return if (uid != null) {
-            getUsersCollection().document(uid).get()
+            getUsersCollection().document(uid).get().continueWith { task: Task<DocumentSnapshot> ->
+                task.result.toObject(
+                    User::class.java
+                )
+            }
         } else {
             null
         }

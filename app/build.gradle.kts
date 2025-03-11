@@ -65,7 +65,7 @@ android {
 }
 
 dependencies {
-    //TO ALLOW USE OF JAVA DATE TIME API
+    //To allow use of java date time api
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.coil.compose)
 
@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.ui.storage)
 
     implementation(libs.androidx.credentials)
 

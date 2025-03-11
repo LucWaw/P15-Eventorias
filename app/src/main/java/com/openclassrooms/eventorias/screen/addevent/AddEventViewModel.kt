@@ -5,10 +5,12 @@ import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.tasks.Task
 import com.openclassrooms.eventorias.data.EventRepository
+import com.openclassrooms.eventorias.data.UserRepository
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,14 +20,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Locale
 
-class AddEventViewModel(private val eventRepository: EventRepository) : ViewModel() {
+class AddEventViewModel(private val eventRepository: EventRepository, val userRepository: UserRepository) : ViewModel() {
     /**
      * Internal mutable state flow representing the current event being edited.
      */
-    private var _event = MutableStateFlow(Event(eventDate = null, eventHours = null))
+    private var _event = MutableStateFlow(Event())
 
     /**
      * Public state flow representing the current event being edited.
@@ -96,8 +99,36 @@ class AddEventViewModel(private val eventRepository: EventRepository) : ViewMode
      * Attempts to add the current post to the repository after setting the author and call getLatitudeAndLongitudeFromAddressName
      *
      */
-    fun addPost(): Task<User>? {
-        return TODO()
+    fun addPost(context: Context): Task<User>? {
+        val userData = userRepository.getUserData()
+
+        if (userData == null) {
+            Log.d("Screen AddEventViewModel", "User data is null")
+            return null
+        }
+
+        return userData.addOnSuccessListener { user ->
+            _event.value = _event.value.copy(
+                author = user
+                )
+            viewModelScope.launch {
+                val pair = getLatitudeAndLongitudeFromAddressName(context, _event.value.eventLocation)
+
+                if (pair != null) {
+                    _event.value = _event.value.copy(
+                        latitude = pair.first,
+                        longitude = pair.second
+                    )
+                }
+                eventRepository.addEvent(
+                    _event.value,
+                    _uriImage.value
+                )
+            }
+
+        }.addOnFailureListener() {
+            Log.d("Screen AddEventViewModel", "Error: $it")
+        }
     }
 
     /**

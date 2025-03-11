@@ -93,7 +93,7 @@ class HomeFeedViewModel(private val eventRepository: EventRepository) : ViewMode
                 if (result is Result.Success) {
                     result.data.collect {
                         _state.update { currentState ->
-                            currentState.copy(event = it.sortedByDescending { it.eventDate })
+                            currentState.copy(event = it.sortedBy { it.eventDate })
                         }
                     }
                 }

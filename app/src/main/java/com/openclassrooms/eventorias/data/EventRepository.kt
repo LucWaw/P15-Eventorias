@@ -1,5 +1,6 @@
 package com.openclassrooms.eventorias.data
 
+import android.net.Uri
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.openclassrooms.eventorias.data.entity.EventDto
@@ -13,6 +14,24 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 class EventRepository(private val eventApi: EventFirebaseApi) {
+
+
+    /**
+     * Retrieves an Event from the backend based on the provided event ID.
+     *
+     * This function interacts with the `eventApi` to fetch event data associated with the given `eventId`.
+     * It then attempts to convert the retrieved data to an `EventDto` object.
+     * If the conversion is successful, it further transforms the `EventDto` to an `Event` object.
+     *
+     * @param eventId The unique identifier of the event to retrieve.
+     * @return A `Task` that, upon successful completion, will contain the retrieved `Event` object.
+     *         If an error occurs during data retrieval or conversion, the task will be completed with an exception.
+     * @throws RuntimeException If the task result cannot be converted to an `EventDto` object.
+     *                          The exception message indicates the failure to convert the task result.
+     * @see EventDto
+     * @see Event
+     * @see eventApi
+     */
     fun getPost(eventId: String): Task<Event> {
         return eventApi.getPost(eventId).continueWith { task ->
             val eventDto = task.result.toObject(EventDto::class.java)
@@ -23,6 +42,27 @@ class EventRepository(private val eventApi: EventFirebaseApi) {
                 Event.fromDto(eventDto)
             }
         }
+    }
+
+    /**
+     * Adds a new Event to the data source using the injected EventApi.
+     *
+     * @param event The Post object to be added.
+     * @param uri The URI of the image associated with the post.
+     */
+    fun addEvent(event: Event, uri: Uri?) {
+        val eventDto = event.toDto()
+        if (uri == null) {
+            eventApi.addEvent(eventDto)
+            return
+        }
+        eventApi.uploadImage(uri).addOnSuccessListener { taskSnapshot ->
+            taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
+                val eventUpdatedURL = eventDto.copy(photoUrl = uri.toString())
+                eventApi.addEvent(eventUpdatedURL)
+            }
+        }
+
     }
 
     /**
