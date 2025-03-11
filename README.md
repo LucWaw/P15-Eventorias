@@ -1,3 +1,3 @@
 # Eventorias
 
-Application mobile de gestion d'événementiel
+Application mobile de gestion événementiel
