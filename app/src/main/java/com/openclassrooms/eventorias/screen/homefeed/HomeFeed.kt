@@ -177,7 +177,7 @@ fun HomeFeedScreen(
 @Composable
 private fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>, onPostClick: (String) -> Unit) {
     LazyColumn(
-        modifier = modifier.padding(24.dp),
+        modifier = modifier.padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(items) { event ->

@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,7 +29,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.openclassrooms.eventorias.screen.Screen
 import com.openclassrooms.eventorias.screen.addevent.AddEventScreen
-import com.openclassrooms.eventorias.screen.component.WhiteButton
 import com.openclassrooms.eventorias.screen.detail.DetailScreen
 import com.openclassrooms.eventorias.screen.homefeed.HomeFeedScreen
 import com.openclassrooms.eventorias.screen.login.LoginMailSelectorScreen
@@ -38,6 +36,7 @@ import com.openclassrooms.eventorias.screen.login.createaccountwithmail.CreateAc
 import com.openclassrooms.eventorias.screen.login.loginproviders.LoginProvidersScreen
 import com.openclassrooms.eventorias.screen.login.loginwithpassword.LoginWithPasswordScreen
 import com.openclassrooms.eventorias.screen.login.recoveraccountwithmail.RecoverAccountWithMailScreen
+import com.openclassrooms.eventorias.screen.profile.ProfileScreen
 import com.openclassrooms.eventorias.ui.theme.BlackBackground
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import org.koin.compose.KoinContext
@@ -222,23 +221,15 @@ class MainActivity : ComponentActivity() {
                 )
             }
             composable(Screen.Profile.route) {
-                Text(
-                    text = "Profile",
-                )
-                WhiteButton(
-                    modifier = Modifier
-                        .padding(24.dp),
-                    text = "Logout",
-                    onClick = {
-                        Firebase.auth.signOut()
-                        //navigate to login screen and clear backstack
-                        navHostController.navigate(Screen.Auth.route) {
-                            popUpTo(Screen.Home.route) {
-                                inclusive = true
+                ProfileScreen(
+                    onSignOut =
+                        {
+                            navHostController.navigate(Screen.Auth.route) {
+                                popUpTo(Screen.Home.route) {
+                                    inclusive = true
+                                }
                             }
-                        }
-                    }
-                )
+                        })
             }
             composable(Screen.AddEvent.route) {
                 AddEventScreen(
