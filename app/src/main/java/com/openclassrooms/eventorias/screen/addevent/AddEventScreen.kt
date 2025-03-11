@@ -1,6 +1,9 @@
 package com.openclassrooms.eventorias.screen.addevent
 
+import android.content.ContentValues
+import android.content.Context
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -46,6 +49,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -95,9 +99,12 @@ fun AddEventScreen(
                 )
             }
     ) { innerPadding ->
-        val post by viewModel.post.collectAsStateWithLifecycle()
+        val event by viewModel.event.collectAsStateWithLifecycle()
         val error by viewModel.error.collectAsStateWithLifecycle()
         val uriImage by viewModel.uriImage.collectAsStateWithLifecycle()
+        var photoUri by remember { mutableStateOf(value = Uri.EMPTY) }
+
+
         val pickMedia =
             rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 // Callback is invoked after the user selects a media item or closes the
@@ -109,18 +116,27 @@ fun AddEventScreen(
                     Log.d("PhotoPicker", "No media selected")
                 }
             }
+
+        val takePicture =  rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success: Boolean ->
+            if (success) {
+                viewModel.onAction(AddPostFormEvent.ImageChanged(photoUri))
+            }
+        }
+
+
+
         AddEvent(
             modifier = Modifier.padding(innerPadding),
             error = error,
-            title = post.title,
+            title = event.title,
             onTitleChanged = { viewModel.onAction(AddPostFormEvent.TitleChanged(it)) },
-            description = post.description,
+            description = event.description,
             onDescriptionChanged = { viewModel.onAction(AddPostFormEvent.DescriptionChanged(it)) },
-            date = post.eventDate,
+            date = event.eventDate,
             onDateChanged = { viewModel.onAction(AddPostFormEvent.LocalDateChanged(it)) },
-            time = post.eventHours,
+            time = event.eventHours,
             onTimeChanged = { viewModel.onAction(AddPostFormEvent.LocalTimeChanged(it)) },
-            address = post.eventLocation,
+            address = event.eventLocation,
             onAddressChanged = { viewModel.onAction(AddPostFormEvent.AddressChanged(it)) },
             onSaveClicked = {
                 viewModel.addPost()?.addOnSuccessListener { onBackClick() }
@@ -128,8 +144,11 @@ fun AddEventScreen(
             openPhotoPicker = {
                 pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             },
-            uriImage = uriImage
-
+            uriImage = uriImage,
+            updatePhotoUriAndLaunchCam = {
+                photoUri = it
+                takePicture.launch(photoUri)
+            }
         )
     }
 }
@@ -152,7 +171,8 @@ private fun AddEvent(
     onAddressChanged: (String) -> Unit,
     onSaveClicked: () -> Unit,
     openPhotoPicker: () -> Unit,
-    uriImage: Uri?
+    uriImage: Uri?,
+    updatePhotoUriAndLaunchCam: (Uri) -> Unit
 ) {
     var descriptionIsFocused by remember { mutableStateOf(false) }
 
@@ -369,9 +389,10 @@ private fun AddEvent(
                 alignment = Alignment.CenterHorizontally
             )
         ) {
+            val context = LocalContext.current
             FloatingActionButton(
                 containerColor = Color.White,
-                onClick = { /*TODO*/ },
+                onClick = { onClickPhoto(context) { updatePhotoUriAndLaunchCam(it) } },
             ) {
                 Icon(
                     painter = painterResource(R.drawable.icon_photo),
@@ -414,6 +435,20 @@ private fun AddEvent(
 
 
     }
+}
+
+fun onClickPhoto(context: Context, updatePhotoUriAndLaunchCam: (Uri) -> Unit) {
+    // Create a Uri for the picture taken
+    val values = ContentValues().apply {
+        put(MediaStore.Images.Media.TITLE, "Image_${System.currentTimeMillis()}.jpg")
+        put(MediaStore.Images.Media.DESCRIPTION, "From Camera")
+    }
+
+    updatePhotoUriAndLaunchCam(
+        context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            ?: Uri.EMPTY
+    )
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -471,7 +506,8 @@ fun PreviewAddEvent() {
             onAddressChanged = {},
             onSaveClicked = {},
             openPhotoPicker = {},
-            uriImage = null
+            uriImage = null,
+            updatePhotoUriAndLaunchCam = {}
         )
     }
 }

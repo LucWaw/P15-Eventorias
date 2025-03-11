@@ -31,7 +31,7 @@ class AddEventViewModel(private val eventRepository: EventRepository) : ViewMode
      * Public state flow representing the current event being edited.
      * This is immutable for consumers.
      */
-    val post: StateFlow<Event>
+    val event: StateFlow<Event>
         get() = _event
 
     private val _uriImage: MutableStateFlow<Uri?> = MutableStateFlow(null)
@@ -41,7 +41,7 @@ class AddEventViewModel(private val eventRepository: EventRepository) : ViewMode
      * StateFlow derived from the post that emits a AddPostFormError if the title is empty or the description is empty or
      * the localTime is empty or the localDate is empty or the address is empty or null otherwise.
      */
-    val error = post.map {
+    val error = event.map {
         verifyPost()
     }.stateIn(
         scope = viewModelScope,
