@@ -46,13 +46,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap.Companion.Round
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,11 +61,12 @@ import coil.util.DebugLogger
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
-import com.openclassrooms.eventorias.util.DateUtils.Companion.toHumanDate
-import com.openclassrooms.eventorias.screen.component.RedButton
+import com.openclassrooms.eventorias.screen.component.ErrorState
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
+import com.openclassrooms.eventorias.ui.theme.GreyCircular
 import com.openclassrooms.eventorias.ui.theme.GreyDate
 import com.openclassrooms.eventorias.ui.theme.GreySuperLight
+import com.openclassrooms.eventorias.util.DateUtils.Companion.toHumanDate
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
@@ -84,7 +84,8 @@ fun HomeFeedScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
 
-    Scaffold(modifier = modifier,
+    Scaffold(
+        modifier = modifier,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             var showText by rememberSaveable { mutableStateOf(true) }
@@ -155,7 +156,13 @@ fun HomeFeedScreen(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    strokeWidth = 4.dp,
+                    color = Color.White,
+                    trackColor = GreyCircular,
+                    strokeCap = Round,
+                    gapSize = 4.dp
+                )
             }
         } else if (state.isError) {
             ErrorState(
@@ -168,14 +175,22 @@ fun HomeFeedScreen(
             )
         } else {
 
-            HomeFeed(modifier = Modifier.padding(innerPadding), items = state.event, onPostClick = onPostClick)
+            HomeFeed(
+                modifier = Modifier.padding(innerPadding),
+                items = state.event,
+                onPostClick = onPostClick
+            )
 
         }
     }
 }
 
 @Composable
-private fun HomeFeed(modifier: Modifier = Modifier, items: List<Event>, onPostClick: (String) -> Unit) {
+private fun HomeFeed(
+    modifier: Modifier = Modifier,
+    items: List<Event>,
+    onPostClick: (String) -> Unit
+) {
     LazyColumn(
         modifier = modifier.padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -271,50 +286,6 @@ private fun EventCell(
 
     }
 
-}
-
-
-@Composable
-private fun ErrorState(modifier: Modifier = Modifier, onTryAgain: () -> Unit) {
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.fillMaxSize()) {
-        Box(
-            modifier = modifier
-                .clip(
-                    CircleShape
-                )
-                .size(64.dp)
-                .background(MaterialTheme.colorScheme.onSurfaceVariant),
-            contentAlignment = Alignment.Center,
-
-            ) {
-            Icon(
-                painter = painterResource(id = R.drawable.icon_error),
-                contentDescription = stringResource(R.string.error),
-                tint = Color.White
-            )
-        }
-        Text(
-
-            text = stringResource(R.string.errorTitle),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.White
-        )
-        Text(
-            modifier = Modifier.width(164.dp),
-            text = stringResource(R.string.errorDescription),
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-        RedButton(
-            modifier = Modifier.padding(top = 35.dp),
-            text = stringResource(R.string.retry),
-            onClick = { onTryAgain() }
-        )
-
-    }
 }
 
 @Composable

@@ -31,7 +31,7 @@ import com.openclassrooms.eventorias.ui.theme.GreySuperLight
 fun CustomTextField(
     modifier: Modifier = Modifier,
     value: String,
-    placeholder: String = "",
+    enabled : Boolean = true,
     onValueChange: (String) -> Unit,
     label: String,
     supportingText: @Composable (() -> Unit)? = null
@@ -39,6 +39,7 @@ fun CustomTextField(
     TextField(
         modifier = modifier,
         shape = RoundedCornerShape(4.dp),
+        enabled = enabled,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.tertiary,
             unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
@@ -59,7 +60,6 @@ fun CustomTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        placeholder = { Text(placeholder) },
         supportingText = supportingText
     )
 

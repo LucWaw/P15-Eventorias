@@ -51,4 +51,11 @@
     <string name="image_selected">Image sélectionné</string>
     <string name="action_save">Valider</string>
     <string name="error_saving_post">Erreur lors de l\'enregistrement de l\'événement</string>
+    <string name="user_profile">Profil utilisateur</string>
+    <string name="sign_out">Se Déconnecter</string>
+    <string name="delete_account">Supprimer Le compte</string>
+    <string name="feature_disabled_on_this_android_version">Feature désactivé sur cette version d\'android</string>
+    <string name="popup_message_confirmation_delete_account">Êtes-vous sûr de vouloir supprimer votre compte ?</string>
+    <string name="popup_message_choice_yes">Oui</string>
+    <string name="popup_message_choice_no">Non</string>
 </resources>

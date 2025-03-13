@@ -3,6 +3,7 @@ package com.openclassrooms.eventorias.screen.addevent
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -470,7 +471,12 @@ fun onClickPhoto(context: Context, updatePhotoUriAndLaunchCam: (Uri) -> Unit) {
         put(MediaStore.Images.Media.TITLE, "Image_${System.currentTimeMillis()}.jpg")
         put(MediaStore.Images.Media.DESCRIPTION, "From Camera")
     }
-
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        Toast.makeText(context,
+            context.getString(R.string.feature_disabled_on_this_android_version), Toast.LENGTH_SHORT)
+            .show()
+        return
+    }
     updatePhotoUriAndLaunchCam(
         context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
             ?: Uri.EMPTY
