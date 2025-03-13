@@ -13,12 +13,14 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import com.openclassrooms.eventorias.data.UserRepository
 import com.openclassrooms.eventorias.data.service.EventFirebaseApi
+import com.openclassrooms.eventorias.screen.profile.ProfileViewModel
 
 val appModule = module {
     singleOf(::EventFirebaseApi)
     singleOf(::EventRepository)
     singleOf(::UserRepository)
 
+    viewModelOf(::ProfileViewModel)
     viewModelOf(::AddEventViewModel)
     viewModelOf(::CreateAccountWithMailViewModel)
     viewModelOf(::DetailViewModel)

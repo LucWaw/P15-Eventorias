@@ -54,4 +54,8 @@
     <string name="user_profile">Profil utilisateur</string>
     <string name="sign_out">Se Déconnecter</string>
     <string name="delete_account">Supprimer Le compte</string>
+    <string name="feature_disabled_on_this_android_version">Feature désactivé sur cette version d\'android</string>
+    <string name="popup_message_confirmation_delete_account">Êtes-vous sûr de vouloir supprimer votre compte ?</string>
+    <string name="popup_message_choice_yes">Oui</string>
+    <string name="popup_message_choice_no">Non</string>
 </resources>

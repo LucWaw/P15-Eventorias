@@ -16,6 +16,13 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.openclassrooms.eventorias.domain.User
+import com.openclassrooms.eventorias.domain.util.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.tasks.await
 
 class UserRepository {
 
@@ -53,7 +60,8 @@ class UserRepository {
                                                 "User does not exist, create user"
                                             )
                                             //Put display name and image url
-                                            createUser(user.displayName ?: "",
+                                            createUser(
+                                                user.displayName ?: "",
                                                 user.photoUrl?.toString()
                                             )
                                         }
@@ -125,7 +133,10 @@ class UserRepository {
         val user = getCurrentUser()
         if (user != null) {
             val uid = user.uid
-            val userToCreate = User(uid, name, photoUrl)
+            val email = user.email
+            val userToCreate = User(
+                uid = uid, displayName = name, email = email ?: "", urlPicture = photoUrl
+            )
 
             getUsersCollection().document(uid).set(userToCreate)
         }
@@ -157,6 +168,19 @@ class UserRepository {
             null
         }
     }
+
+    fun getResultUserData(): Flow<Result<User>> = flow {
+        emit(Result.Loading)
+
+        val userDataTask = getUserData() ?: throw IllegalStateException("User data task is null")
+        @Suppress("USELESS_ELVIS") val userData = userDataTask.await()
+            ?: throw IllegalStateException("User data is null") //static analysis is wrong here, keep the ?: operator
+
+        emit(Result.Success(userData))
+    }.catch {
+        emit(Result.Error)
+    }.flowOn(Dispatchers.IO)
+
 
     // Get the current user's UID
     private fun getCurrentUserUID(): String? {

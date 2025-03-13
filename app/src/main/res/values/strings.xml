@@ -53,4 +53,8 @@
     <string name="user_profile">User profile</string>
     <string name="sign_out">Sign Out</string>
     <string name="delete_account">Delete Account</string>
+    <string name="feature_disabled_on_this_android_version">Feature disabled on this android version</string>
+    <string name="popup_message_confirmation_delete_account">Are you sure you want to delete your account?</string>
+    <string name="popup_message_choice_yes">Yes</string>
+    <string name="popup_message_choice_no">No</string>
 </resources>
