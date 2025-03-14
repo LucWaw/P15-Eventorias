@@ -126,7 +126,7 @@ class AddEventViewModel(private val eventRepository: EventRepository, val userRe
                 )
             }
 
-        }.addOnFailureListener() {
+        }.addOnFailureListener {
             Log.d("Screen AddEventViewModel", "Error: $it")
         }
     }

@@ -2,6 +2,7 @@ package com.openclassrooms.eventorias.screen.profile
 
 import android.app.AlertDialog
 import android.content.Context
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,10 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +42,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.util.DebugLogger
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.tasks.Task
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.User
@@ -155,7 +156,9 @@ fun ProfileScreen(
                         onSignOut,
                         context
                     )
-                }
+                },
+                notification = state.notification,
+                onCheckSwitch = { viewModel.onNotificationClicked(it) }
             )
         }
 
@@ -169,13 +172,15 @@ fun Profile(
     modifier: Modifier = Modifier,
     onSignOut: () -> Unit,
     user: User,
+    notification: Boolean,
+    onCheckSwitch: (Boolean) -> Unit,
     onDeleteAccount: () -> Unit
 ) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp, vertical = 22.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        UserData(user)
+        UserData(user, notification = notification, onCheckSwitch = onCheckSwitch)
 
         Spacer(modifier = Modifier.height(66.dp))
 
@@ -206,8 +211,23 @@ private fun openDeleteDialog(
 }
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun UserData(user: User) {
+private fun UserData(
+    user: User,
+    modifier: Modifier = Modifier,
+    notification: Boolean,
+    onCheckSwitch: (Boolean) -> Unit
+) {
+    val notificationsPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberPermissionState(
+            android.Manifest.permission.POST_NOTIFICATIONS
+        )
+    } else {
+        null
+    }
+
+
     CustomTextField(
         value = user.displayName,
         label = "Name",
@@ -223,23 +243,28 @@ private fun UserData(user: User) {
         onValueChange = { },
         modifier = Modifier.fillMaxWidth()
     )
-    var checked by remember { mutableStateOf(true) }
 
     Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         Switch(
-            checked = checked,
-            onCheckedChange = {
-                checked = it
+            checked = notification,
+            onCheckedChange = { isChecked ->
+                onCheckSwitch(isChecked)
+                if (isChecked == true && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (notificationsPermissionState?.status?.isGranted == false) {
+                        notificationsPermissionState.launchPermissionRequest()
+                    }
+                }
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
                 uncheckedThumbColor = Color.White,
-            ),
-
             )
+        )
         Text("Notifications")
     }
 }
@@ -273,7 +298,9 @@ fun ProfilePreview() {
     EventoriasTheme {
         Profile(
             onSignOut = {}, user = User("1", "John Doe", ""),
-            onDeleteAccount = {}
+            onDeleteAccount = {},
+            notification = true,
+            onCheckSwitch = { }
         )
     }
 }

@@ -69,6 +69,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.coil.compose)
 
+    implementation(libs.accompanist.permissions)
 
     //firebase
     implementation(platform(libs.firebase.bom))
@@ -77,6 +78,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.ui.storage)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.messaging.directboot)
 
     implementation(libs.androidx.credentials)
 

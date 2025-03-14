@@ -481,7 +481,6 @@ fun onClickPhoto(context: Context, updatePhotoUriAndLaunchCam: (Uri) -> Unit) {
         context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
             ?: Uri.EMPTY
     )
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
