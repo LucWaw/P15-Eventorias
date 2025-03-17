@@ -78,6 +78,7 @@ fun HomeFeedScreen(
     modifier: Modifier = Modifier,
     onPostClick: (String) -> Unit,
     onAddClick: () -> Unit,
+    isAccessibilityEnabled: Boolean = false,
     viewModel: HomeFeedViewModel = koinViewModel(),
 ) {
     val scope = rememberCoroutineScope()
@@ -118,12 +119,23 @@ fun HomeFeedScreen(
                     }
                 },
                 actions = {
+                    if (isAccessibilityEnabled) {
+                        IconButton(
+                            onClick = { onAddClick() },
+                        ) {
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.add_a_event),
+                                tint = Color.White
+                            )
+                        }
+                    }
                     IconButton(
                         onClick = { showText = !showText },
                     ) {
                         Icon(
                             Icons.Default.Search,
-                            contentDescription = stringResource(R.string.add_a_event),
+                            contentDescription = stringResource(R.string.search_an_item),
                             tint = Color.White
                         )
                     }

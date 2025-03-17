@@ -1,6 +1,7 @@
 package com.openclassrooms.eventorias
 
 import android.os.Bundle
+import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -49,9 +50,12 @@ class MainActivity : ComponentActivity() {
             KoinContext {
                 val navController = rememberNavController()
 
+                val accessibilityManager =
+                    this.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
+
                 EventoriasTheme {
                     BottomNavigation(navController) {
-                        EventoriasNavHost(navController, it)
+                        EventoriasNavHost(navController, it, accessibilityManager)
                     }
 
                 }
@@ -125,7 +129,11 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun EventoriasNavHost(navHostController: NavHostController, innerPadding: PaddingValues) {
+    fun EventoriasNavHost(
+        navHostController: NavHostController,
+        innerPadding: PaddingValues,
+        accessibilityManager: AccessibilityManager
+    ) {
         NavHost(
             modifier = Modifier.padding(innerPadding),
             navController = navHostController,
@@ -202,12 +210,15 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+
             composable(Screen.Home.route) {
-                HomeFeedScreen(onPostClick = {
+                HomeFeedScreen(
+                    onPostClick = {
                     navHostController.navigate("${Screen.Detail.route}/${it}")
                 }, onAddClick = {
                     navHostController.navigate(Screen.AddEvent.route)
-                }
+                },
+                    isAccessibilityEnabled = accessibilityManager.isEnabled && accessibilityManager.isTouchExplorationEnabled
                 )
             }
             composable(
