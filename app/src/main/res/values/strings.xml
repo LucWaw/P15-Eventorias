@@ -57,4 +57,6 @@
     <string name="popup_message_confirmation_delete_account">Are you sure you want to delete your account?</string>
     <string name="popup_message_choice_yes">Yes</string>
     <string name="popup_message_choice_no">No</string>
+    <string name="delete_error_database">Deletion error: unable to delete account from database</string>
+    <string name="delete_error_auth">Deletion error: unable to delete auth account</string>
 </resources>

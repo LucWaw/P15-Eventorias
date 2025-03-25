@@ -62,7 +62,8 @@ class UserRepository {
                                             //Put display name and image url
                                             createUser(
                                                 user.displayName ?: "",
-                                                user.photoUrl?.toString()
+                                                user.photoUrl?.toString(),
+                                                true
                                             )
                                         }
                                     }
@@ -120,22 +121,22 @@ class UserRepository {
      * Delete the User from Firestore and Auth.
      * @return Task<Void> The task to delete the user.
      */
-    fun deleteUser(): Task<Void> {
+    fun deleteUser(): Task<Task<Void?>?> {
         // Delete user from Firestore
-        return deleteUserFromFirestore().addOnSuccessListener {
+        return deleteUserFromFirestore().continueWith {
             // Delete the user account from the Auth
             getCurrentUser()?.delete()
         }
     }
 
     // Create User in Firestore
-    private fun createUser(name: String, photoUrl: String? = null) {
+    private fun createUser(name: String, photoUrl: String? = null, isGoogleSignIn: Boolean = false) {
         val user = getCurrentUser()
         if (user != null) {
             val uid = user.uid
             val email = user.email
             val userToCreate = User(
-                uid = uid, displayName = name, email = email ?: "", urlPicture = photoUrl
+                uid = uid, displayName = name, email = email ?: "", urlPicture = photoUrl, googleSignIn = isGoogleSignIn
             )
 
             getUsersCollection().document(uid).set(userToCreate)

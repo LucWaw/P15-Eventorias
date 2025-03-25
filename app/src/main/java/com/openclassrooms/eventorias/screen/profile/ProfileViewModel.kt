@@ -87,7 +87,7 @@ class ProfileViewModel(val userRepository: UserRepository, application: Applicat
                 }
 
                 is Result.Error -> {
-                    Log.e("ProfileViewModel", "Error loading events")
+                    Log.e("ProfileViewModel", "Error loading user data")
 
                     _state.update { currentState ->
                         currentState.copy(isLoading = false, isError = true)
@@ -101,7 +101,7 @@ class ProfileViewModel(val userRepository: UserRepository, application: Applicat
         userRepository.signOut()
     }
 
-    fun deleteCurrentUser(): Task<Void> {
+    fun deleteCurrentUser(): Task<Task<Void?>?> {
         return userRepository.deleteUser()
     }
 

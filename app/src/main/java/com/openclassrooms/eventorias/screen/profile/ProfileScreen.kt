@@ -1,8 +1,12 @@
 package com.openclassrooms.eventorias.screen.profile
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -35,6 +40,7 @@ import androidx.compose.ui.graphics.StrokeCap.Companion.Round
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,7 +83,8 @@ fun ProfileScreen(
                     Text(stringResource(R.string.user_profile))
                 },
                 actions = {
-                    if (!state.user.urlPicture.isNullOrEmpty()) {
+
+                    if (state.user.googleSignIn) {
                         AsyncImage(
                             modifier = Modifier
                                 .padding(24.dp)
@@ -91,6 +98,33 @@ fun ProfileScreen(
                             contentDescription = "image",
                             contentScale = ContentScale.Crop,
                         )
+                    } else {
+                        IconButton(
+                            modifier = Modifier.padding(24.dp),
+                            onClick = { TODO() },
+                        ) {
+                            if (state.user.urlPicture.isNullOrEmpty()) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.image_placeholder),
+                                    contentDescription = "Default Profile",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                )
+                            } else {
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    model = state.user.urlPicture,
+                                    imageLoader = LocalContext.current.imageLoader.newBuilder()
+                                        .logger(DebugLogger())
+                                        .build(),
+                                    placeholder = ColorPainter(Color.LightGray),
+                                    contentDescription = "User Profile Image",
+                                    contentScale = ContentScale.Crop,
+                                )
+                            }
+
+                        }
                     }
 
                 }
@@ -192,7 +226,7 @@ fun Profile(
 }
 
 private fun openDeleteDialog(
-    deleteUser: () -> Task<Void>,
+    deleteUser: () -> Task<Task<Void?>?>,
     onBackClick: () -> Unit,
     context: Context
 ) {
@@ -202,9 +236,23 @@ private fun openDeleteDialog(
             R.string.popup_message_choice_yes
         ) { _, _ ->
             deleteUser()
-                .addOnSuccessListener {
-                    onBackClick()
+                .addOnSuccessListener { innerTask ->
+                    innerTask?.addOnSuccessListener {
+                        onBackClick()
+                    }?.addOnFailureListener {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.delete_error_auth), Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
+                .addOnFailureListener {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.delete_error_database), Toast.LENGTH_SHORT
+                    ).show()
+                }
+
         }
         .setNegativeButton(R.string.popup_message_choice_no, null)
         .show()
@@ -221,7 +269,7 @@ private fun UserData(
 ) {
     val notificationsPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(
-            android.Manifest.permission.POST_NOTIFICATIONS
+            Manifest.permission.POST_NOTIFICATIONS
         )
     } else {
         null
@@ -236,10 +284,12 @@ private fun UserData(
         modifier = Modifier.fillMaxWidth()
     )
 
+    Log.d("ProfileScreen", "Is google signIn: ${user.googleSignIn}")
+
     CustomTextField(
         value = user.email,
         label = "E-mail",
-        enabled = false,
+        enabled = user.googleSignIn,
         onValueChange = { },
         modifier = Modifier.fillMaxWidth()
     )

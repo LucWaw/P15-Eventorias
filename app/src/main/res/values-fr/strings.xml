@@ -58,4 +58,6 @@
     <string name="popup_message_confirmation_delete_account">Êtes-vous sûr de vouloir supprimer votre compte ?</string>
     <string name="popup_message_choice_yes">Oui</string>
     <string name="popup_message_choice_no">Non</string>
+    <string name="delete_error_database">Erreur lors de la suppression : impossible de supprimer le compte en base</string>
+    <string name="delete_error_auth">Erreur lors de la suppression : impossible de supprimer le compte auth</string>
 </resources>
