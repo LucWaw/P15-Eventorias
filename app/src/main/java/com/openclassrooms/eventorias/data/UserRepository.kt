@@ -1,6 +1,8 @@
 package com.openclassrooms.eventorias.data
 
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.credentials.Credential
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -15,6 +17,8 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import com.openclassrooms.eventorias.domain.User
 import com.openclassrooms.eventorias.domain.util.Result
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +27,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class UserRepository {
 
@@ -187,5 +192,70 @@ class UserRepository {
     private fun getCurrentUserUID(): String? {
         val user: FirebaseUser? = getCurrentUser()
         return user?.uid
+    }
+
+
+
+    /**
+     * Updates a user's information in the database.
+     *
+     * This function handles updating a user's data, including their profile picture if provided.
+     * It first checks if a profile picture URL is supplied. If not, it updates the user's data
+     * without any image-related operations. If a profile picture URL is provided, it uploads the
+     * image, retrieves the download URL, and then updates the user's data with the new image URL.
+     * After the user data update, it triggers an email verification process for the user if the
+     * email was modified.
+     *
+     * @param userBase The base User object containing the updated user information.
+     *                 It includes the user's UID, name, email, and potentially a new profile picture URL.
+     *                 The [userBase.email] will be used for email update verification, and the
+     *                 [userBase.urlPicture] will be processed for uploading if it is not null or empty.
+     * @return A Task that represents the asynchronous operation of updating the user.
+     *         The outer Task will resolve to another inner Task. The inner Task represents the result of the update operation.
+     *         - If the update is successful, the inner Task will be successful.
+     *         - If an error occurs during the update, the inner Task will fail with an exception.
+     *         - If there is no image to upload, the inner task will contain the result of the user data set operation.
+     *         - If there is an image to upload, the inner task will be the result of the image upload and the user data set operation
+     *          including the downloaded URL.
+     *         The outer Task will also contain an error if any operation has failed.
+     *
+     * @throws Exception if an unknown error occurs during image upload or user data update.
+     *
+     * Note: This function relies on the following external dependencies:
+     * - `getCurrentUser()`: A function that returns the currently authenticated user.
+     * - `getUsersCollection()`: A function that returns a reference to the users collection in the database.
+     */
+    fun updateUser(userBase: User): Task<out Task<out Any?>?> {
+        val user = userBase.copy(email = getCurrentUser()?.email ?: "") // Email update after user auth validation
+
+        return if (userBase.urlPicture.isNullOrEmpty()) {
+            // If the image is empty, we return a simple user update task without an image
+            val updateTask = getUsersCollection().document(user.uid).set(user).continueWith {
+                getCurrentUser()?.verifyBeforeUpdateEmail(userBase.email)
+            }
+            Tasks.forResult(updateTask) // Wrap the result in a Task<Task<Void?>?>
+        } else {
+            // If the image is supplied, proceed to image download
+            val uploadTask = uploadImage(userBase.urlPicture.toUri()).continueWithTask { task ->
+                if (task.isSuccessful) {
+                    task.result?.storage?.downloadUrl?.addOnSuccessListener { uri ->
+                        val userUpdatedUri = user.copy(urlPicture = uri.toString())
+                        // Update user with image URL
+                        getUsersCollection().document(userUpdatedUri.uid).set(userUpdatedUri).continueWith {
+                            getCurrentUser()?.verifyBeforeUpdateEmail(userBase.email)
+                        }
+                    }
+                } else {
+                    Tasks.forException<Void>(task.exception ?: Exception("Unknown error"))
+                }
+            }
+            Tasks.forResult(uploadTask) // Wrap the result in a Task<Task<Void?>?>
+        }
+    }
+
+    fun uploadImage(imageUri: Uri): UploadTask {
+        val uuid = UUID.randomUUID().toString() // GENERATE UNIQUE STRING
+        val mImageRef = FirebaseStorage.getInstance().getReference("$COLLECTION_NAME/$uuid")
+        return mImageRef.putFile(imageUri)
     }
 }

@@ -6,6 +6,9 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +33,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -52,6 +56,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.User
 import com.openclassrooms.eventorias.screen.component.CustomTextField
@@ -73,6 +78,22 @@ fun ProfileScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    LaunchedEffect(
+        Unit
+    ) {
+        viewModel.updateFirestoreMail()
+    }
+    val pickMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            // Callback is invoked after the user selects a media item or closes the
+            // photo picker.
+            if (uri != null) {
+                Log.d("PhotoPicker", "Selected URI: $uri")
+                viewModel.onAction(ProfileAction.ImageChanged(uri))
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
@@ -95,13 +116,15 @@ fun ProfileScreen(
                                 .logger(DebugLogger())
                                 .build(),
                             placeholder = ColorPainter(Color.LightGray),
-                            contentDescription = "image",
+                            contentDescription = "user image",
                             contentScale = ContentScale.Crop,
                         )
                     } else {
                         IconButton(
                             modifier = Modifier.padding(24.dp),
-                            onClick = { TODO() },
+                            onClick = {
+                                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            },
                         ) {
                             if (state.user.urlPicture.isNullOrEmpty()) {
                                 Image(
@@ -192,7 +215,10 @@ fun ProfileScreen(
                     )
                 },
                 notification = state.notification,
-                onCheckSwitch = { viewModel.onNotificationClicked(it) }
+                onCheckSwitch = { viewModel.onNotificationClicked(it) },
+                onEmailChange = { viewModel.onAction(ProfileAction.EmailChanged(it)) },
+                onNameChange = { viewModel.onAction(ProfileAction.NameChanged(it)) },
+                onSaveUserInfo = { viewModel.updateProfileInfo() }
             )
         }
 
@@ -207,16 +233,56 @@ fun Profile(
     onSignOut: () -> Unit,
     user: User,
     notification: Boolean,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
     onCheckSwitch: (Boolean) -> Unit,
+    onSaveUserInfo: () -> Task<out Task<out Any?>?>,
     onDeleteAccount: () -> Unit
 ) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp, vertical = 22.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        UserData(user, notification = notification, onCheckSwitch = onCheckSwitch)
+        UserData(
+            user,
+            notification = notification,
+            onCheckSwitch = onCheckSwitch,
+            onNameChange = onNameChange,
+            onEmailChange = onEmailChange
+        )
 
         Spacer(modifier = Modifier.height(66.dp))
+
+        val context = LocalContext.current
+        val stringSaved = stringResource(R.string.saved)
+        WhiteButton(
+            text = stringResource(R.string.update_info),
+            onClick = {
+                onSaveUserInfo().addOnSuccessListener { innerTask ->
+                    innerTask?.addOnSuccessListener {
+                        Toast.makeText(
+                            context,
+                            stringSaved, Toast.LENGTH_LONG
+                        ).show()
+                    }?.addOnFailureListener {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.you_must_have_logged_in_recently_to_update_your_e_mail),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }.addOnFailureListener {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.error_update), Toast.LENGTH_LONG
+                    ).show()
+                }
+            },
+            modifier = Modifier
+                .width(242.dp)
+                .height(52.dp)
+                .align(Alignment.CenterHorizontally)
+        )
 
         AccountHandlingButtons(
             onSignOut = { onSignOut() },
@@ -265,6 +331,8 @@ private fun UserData(
     user: User,
     modifier: Modifier = Modifier,
     notification: Boolean,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
     onCheckSwitch: (Boolean) -> Unit
 ) {
     val notificationsPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -279,8 +347,7 @@ private fun UserData(
     CustomTextField(
         value = user.displayName,
         label = "Name",
-        enabled = false,
-        onValueChange = { },
+        onValueChange = { onNameChange(it) },
         modifier = Modifier.fillMaxWidth()
     )
 
@@ -289,8 +356,8 @@ private fun UserData(
     CustomTextField(
         value = user.email,
         label = "E-mail",
-        enabled = user.googleSignIn,
-        onValueChange = { },
+        enabled = !user.googleSignIn,
+        onValueChange = { onEmailChange(it) },
         modifier = Modifier.fillMaxWidth()
     )
 
@@ -321,6 +388,7 @@ private fun UserData(
 
 @Composable
 private fun ColumnScope.AccountHandlingButtons(onSignOut: () -> Unit, onDeleteAccount: () -> Unit) {
+
     WhiteButton(
         text = stringResource(R.string.sign_out),
         onClick = {
@@ -350,7 +418,10 @@ fun ProfilePreview() {
             onSignOut = {}, user = User("1", "John Doe", ""),
             onDeleteAccount = {},
             notification = true,
-            onCheckSwitch = { }
+            onCheckSwitch = { },
+            onNameChange = { },
+            onEmailChange = { },
+            onSaveUserInfo = { Tasks.forResult(null) }
         )
     }
 }

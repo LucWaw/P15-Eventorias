@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.openclassrooms.eventorias.data.UserRepository
 import com.openclassrooms.eventorias.domain.User
@@ -26,14 +27,64 @@ class ProfileViewModel(val userRepository: UserRepository, application: Applicat
     private val notificationManagerHelper =
         NotificationService(getApplication<Application>().applicationContext)
 
-
     init {
         viewModelScope.launch {
             loadUserData().collect {}
         }
     }
 
+    fun updateFirestoreMail() {
+        // if email in firestore is different from email in auth, update email in firestore
+        val user = userRepository.getCurrentUser()
 
+        if (user != null) {
+            val email = user.email
+            if (email != null) {
+                val userRef = FirebaseFirestore.getInstance().collection("users").document(user.uid)
+                userRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val user = document.toObject(User::class.java)
+                        if (user != null && user.email != email) {
+                            userRef.update("email", email)
+                            onAction(ProfileAction.EmailChanged(email))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles profile events like email, image and name changes.
+     */
+    fun onAction(profileAction: ProfileAction) {
+        when (profileAction) {
+            is ProfileAction.EmailChanged -> {
+                _state.update { currentState ->
+                    //update user.email with the new email
+                    currentState.copy(user = currentState.user.copy(email = profileAction.email))
+                }
+            }
+
+            is ProfileAction.ImageChanged -> {
+                _state.update { currentState ->
+                    //update user.urlPicture with the new image
+                    currentState.copy(user = currentState.user.copy(urlPicture = profileAction.image.toString()))
+                }
+            }
+
+            is ProfileAction.NameChanged -> {
+                _state.update { currentState ->
+                    //update user.name with the new name
+                    currentState.copy(user = currentState.user.copy(displayName = profileAction.name))
+                }
+            }
+        }
+    }
+
+    fun updateProfileInfo(): Task<out Task<out Any?>?> {
+        return userRepository.updateUser(state.value.user)
+    }
 
 
     fun onNotificationClicked(checked: Boolean) {
@@ -43,7 +94,6 @@ class ProfileViewModel(val userRepository: UserRepository, application: Applicat
 
         if (state.value.notification) {
             enableNotifications()
-
 
 
         } else {
