@@ -3,6 +3,7 @@ package com.openclassrooms.eventorias.screen.profile
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -126,7 +127,7 @@ fun ProfileScreen(
                                 pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                             },
                         ) {
-                            if (state.user.urlPicture.isNullOrEmpty()) {
+                            if (state.user.urlPicture.isNullOrEmpty() && state.changedUri == Uri.EMPTY) {
                                 Image(
                                     painter = painterResource(id = R.drawable.image_placeholder),
                                     contentDescription = "Default Profile",
@@ -134,17 +135,31 @@ fun ProfileScreen(
                                         .fillMaxSize()
                                 )
                             } else {
-                                AsyncImage(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    model = state.user.urlPicture,
-                                    imageLoader = LocalContext.current.imageLoader.newBuilder()
-                                        .logger(DebugLogger())
-                                        .build(),
-                                    placeholder = ColorPainter(Color.LightGray),
-                                    contentDescription = "User Profile Image",
-                                    contentScale = ContentScale.Crop,
-                                )
+                                if (state.changedUri != Uri.EMPTY) {
+                                    AsyncImage(
+                                        modifier = Modifier
+                                            .fillMaxSize(),
+                                        model = state.changedUri,
+                                        imageLoader = LocalContext.current.imageLoader.newBuilder()
+                                            .logger(DebugLogger())
+                                            .build(),
+                                        placeholder = ColorPainter(Color.LightGray),
+                                        contentDescription = "User Profile Image",
+                                        contentScale = ContentScale.Crop,
+                                    )
+                                } else {
+                                    AsyncImage(
+                                        modifier = Modifier
+                                            .fillMaxSize(),
+                                        model = state.user.urlPicture,
+                                        imageLoader = LocalContext.current.imageLoader.newBuilder()
+                                            .logger(DebugLogger())
+                                            .build(),
+                                        placeholder = ColorPainter(Color.LightGray),
+                                        contentDescription = "User Profile Image",
+                                        contentScale = ContentScale.Crop,
+                                    )
+                                }
                             }
 
                         }
@@ -236,7 +251,7 @@ fun Profile(
     onNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onCheckSwitch: (Boolean) -> Unit,
-    onSaveUserInfo: () -> Task<out Task<out Any?>?>,
+    onSaveUserInfo: () -> Task<Void>,
     onDeleteAccount: () -> Unit
 ) {
     Column(
@@ -254,23 +269,14 @@ fun Profile(
         Spacer(modifier = Modifier.height(66.dp))
 
         val context = LocalContext.current
-        val stringSaved = stringResource(R.string.saved)
         WhiteButton(
             text = stringResource(R.string.update_info),
             onClick = {
-                onSaveUserInfo().addOnSuccessListener { innerTask ->
-                    innerTask?.addOnSuccessListener {
-                        Toast.makeText(
-                            context,
-                            stringSaved, Toast.LENGTH_LONG
-                        ).show()
-                    }?.addOnFailureListener {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.you_must_have_logged_in_recently_to_update_your_e_mail),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                onSaveUserInfo().addOnSuccessListener {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.saved), Toast.LENGTH_LONG
+                    ).show()
                 }.addOnFailureListener {
                     Toast.makeText(
                         context,

@@ -69,7 +69,7 @@ class ProfileViewModel(val userRepository: UserRepository, application: Applicat
             is ProfileAction.ImageChanged -> {
                 _state.update { currentState ->
                     //update user.urlPicture with the new image
-                    currentState.copy(user = currentState.user.copy(urlPicture = profileAction.image.toString()))
+                    currentState.copy(changedUri =  profileAction.image)
                 }
             }
 
@@ -82,8 +82,8 @@ class ProfileViewModel(val userRepository: UserRepository, application: Applicat
         }
     }
 
-    fun updateProfileInfo(): Task<out Task<out Any?>?> {
-        return userRepository.updateUser(state.value.user)
+    fun updateProfileInfo(): Task<Void> {
+        return userRepository.updateUser(state.value.user, state.value.changedUri)
     }
 
 

@@ -74,12 +74,12 @@ class MainActivity : ComponentActivity() {
         val topLevelRoutes = listOf(
             TopLevelRoute(
                 stringResource(R.string.events),
-                Screen.Home.route,
+                if (Firebase.auth.currentUser != null) Screen.Home.route else Screen.Auth.route,
                 painterResource(R.drawable.icon_event)
             ),
             TopLevelRoute(
                 stringResource(R.string.profile),
-                Screen.Profile.route,
+                if (Firebase.auth.currentUser != null) Screen.Profile.route else Screen.Auth.route,
                 painterResource(R.drawable.profile_icon)
             ),
         )
