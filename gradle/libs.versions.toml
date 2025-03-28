@@ -18,7 +18,7 @@ google = "4.4.2"
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.8.7"
 coilCompose = "2.6.0"
-firebaseUI = "8.0.2"
+firebaseUI = "9.0.0"
 material3= "1.4.0-alpha07"
 accompanistPermissions = "0.34.0"
 

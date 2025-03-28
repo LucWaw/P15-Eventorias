@@ -133,6 +133,15 @@ class MainActivity : ComponentActivity() {
         innerPadding: PaddingValues,
         accessibilityManager: AccessibilityManager
     ) {
+        Firebase.auth.addAuthStateListener { auth ->
+            if (auth.currentUser == null) {
+                navHostController.navigate(Screen.Auth.route) {
+                    popUpTo(Screen.Home.route) { inclusive = true }
+                }
+            }
+        }
+
+
         NavHost(
             modifier = Modifier.padding(innerPadding),
             navController = navHostController,
@@ -213,10 +222,10 @@ class MainActivity : ComponentActivity() {
             composable(Screen.Home.route) {
                 HomeFeedScreen(
                     onPostClick = {
-                    navHostController.navigate("${Screen.Detail.route}/${it}")
-                }, onAddClick = {
-                    navHostController.navigate(Screen.AddEvent.route)
-                },
+                        navHostController.navigate("${Screen.Detail.route}/${it}")
+                    }, onAddClick = {
+                        navHostController.navigate(Screen.AddEvent.route)
+                    },
                     isAccessibilityEnabled = accessibilityManager.isEnabled && accessibilityManager.isTouchExplorationEnabled
                 )
             }

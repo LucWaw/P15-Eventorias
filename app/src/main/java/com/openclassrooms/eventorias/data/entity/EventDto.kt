@@ -1,8 +1,10 @@
 package com.openclassrooms.eventorias.data.entity
 
+import androidx.annotation.Keep
 import com.openclassrooms.eventorias.domain.User
 import java.io.Serializable
 
+@Keep
 data class EventDto(
     var id: String = "",
     val title: String = "",
@@ -14,4 +16,7 @@ data class EventDto(
     val longitude: Double = 0.0,
     val photoUrl: String? = null,
     val author: User = User()
-) : Serializable
+
+) : Serializable {
+    constructor() : this("", "", "", 0, 0, "", 0.0, 0.0, null, User())
+}
