@@ -74,12 +74,12 @@ class MainActivity : ComponentActivity() {
         val topLevelRoutes = listOf(
             TopLevelRoute(
                 stringResource(R.string.events),
-                if (Firebase.auth.currentUser != null) Screen.Home.route else Screen.Auth.route,
+                Screen.Home.route,
                 painterResource(R.drawable.icon_event)
             ),
             TopLevelRoute(
                 stringResource(R.string.profile),
-                if (Firebase.auth.currentUser != null) Screen.Profile.route else Screen.Auth.route,
+                Screen.Profile.route,
                 painterResource(R.drawable.profile_icon)
             ),
         )
@@ -103,17 +103,16 @@ class MainActivity : ComponentActivity() {
                             enabled = Firebase.auth.currentUser != null,
                             selected = currentDestination?.route == topLevelRoute.route,
                             onClick = {
-                                navController.navigate(topLevelRoute.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
-                                    // on the back stack as users select items
+                                val destination = if (Firebase.auth.currentUser != null) {
+                                    topLevelRoute.route
+                                } else {
+                                    Screen.Auth.route
+                                }
+                                navController.navigate(destination) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
-                                    // Avoid multiple copies of the same destination when
-                                    // reselecting the same item
                                     launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
                                     restoreState = true
                                 }
                             }

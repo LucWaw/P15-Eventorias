@@ -55,6 +55,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -218,6 +219,7 @@ private fun AddEvent(
                 onValueChange = { onTitleChanged(it) },
                 label = stringResource(R.string.title),
                 modifier = Modifier
+                    .testTag("eventTitleInput")
                     .fillMaxWidth()
                     .onFocusChanged { titleIsFocused = it.isFocused },
                 supportingText = if (error is AddPostFormError.TitleError) {
@@ -241,6 +243,7 @@ private fun AddEvent(
                 onValueChange = { onDescriptionChanged(it) },
                 label = "Description",
                 modifier = Modifier
+                    .testTag("eventDescriptionInput")
                     .fillMaxWidth()
                     .onFocusChanged { descriptionIsFocused = it.isFocused },
                 supportingText = if (error is AddPostFormError.DescriptionError) {
@@ -284,7 +287,7 @@ private fun AddEvent(
                             ),
                         onValueChange = {},
                         label = "Date",
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().testTag("eventDateInput"),
                         supportingText = if (error is AddPostFormError.LocalDateError) {
                             {
                                 Text(
@@ -315,7 +318,7 @@ private fun AddEvent(
                         value = time?.toHumanTime() ?: "HH : MM",
                         onValueChange = {},
                         label = stringResource(R.string.time),
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().testTag("eventTimeInput"),
                         supportingText = if (error is AddPostFormError.LocalTimeError) {
                             {
                                 Text(
@@ -398,6 +401,7 @@ private fun AddEvent(
                 onValueChange = { onAddressChanged(it) },
                 label = stringResource(R.string.address),
                 modifier = Modifier
+                    .testTag("eventAddressInput")
                     .fillMaxWidth()
                     .onFocusChanged { addressIsFocused = it.isFocused },
                 supportingText = if (error is AddPostFormError.AddressError) {

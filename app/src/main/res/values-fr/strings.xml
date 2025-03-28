@@ -22,7 +22,7 @@
     <string name="popup_message_recovery_account">Suivez les instructions envoyées à l\'adresse %1$s pour récuperer votre mot de passe</string>
     <string name="logged_out">Déconnecté !</string>
     <string name="incorrect_password">Mot de passe incorrect</string>
-    <string name="add_a_event">Ajouter un événement</string>
+    <string name="add_an_event">Ajouter un événement</string>
     <string name="event_List">Liste des événements</string>
     <string name="search_an_item">Recherchez parmi les événements</string>
     <string name="sort_event">Trier les événements par nom ou par date</string>

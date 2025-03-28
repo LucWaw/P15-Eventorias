@@ -1,10 +1,14 @@
 package com.openclassrooms.eventorias
 
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
@@ -16,26 +20,40 @@ import org.koin.test.KoinTest
 class AddEventTest : KoinTest {
 
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(listOf())
+    /*@get:Rule
+    val koinTestRule = KoinTestRule(listOf())*/
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Test
     fun testAddEvent() {
-        // Vérifier le nombre initial d'événements affichés
+
+        // WAIT Loading
+        composeTestRule.waitUntil(timeoutMillis = 50000) {
+            composeTestRule
+                .onNodeWithContentDescription("Add an Event")
+                .isDisplayed()
+        }
+
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+            composeTestRule
+                .onAllNodesWithTag("eventItemTag")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+
         val initialEventCount = composeTestRule
             .onAllNodesWithTag("eventItemTag")
             .fetchSemanticsNodes()
             .size
 
-        // 1️⃣ - Cliquer sur le bouton "Add an Event"
+        composeTestRule.onAllNodesWithTag("eventItemTag").printToLog("eventItemTag")
+
+
         composeTestRule
-            .onNodeWithTag("addEventButton")
+            .onNodeWithContentDescription("Add an Event")
             .performClick()
 
-        // 2️⃣ - Remplir le formulaire (exemple avec un champ de texte)
         composeTestRule
             .onNodeWithTag("eventTitleInput")
             .performTextInput("Nouvel Événement")
@@ -44,12 +62,49 @@ class AddEventTest : KoinTest {
             .onNodeWithTag("eventDescriptionInput")
             .performTextInput("Ceci est un test")
 
-        // 3️⃣ - Valider l'ajout
         composeTestRule
-            .onNodeWithTag("submitEventButton")
+            .onNodeWithTag("eventAddressInput")
+            .performTextInput("Paris")
+
+
+        composeTestRule.onNodeWithTag("eventDateInput")
             .performClick()
 
-        // 4️⃣ - Vérifier que le Home Screen affiche un événement en plus
+        //Click on the "OK" button
+        composeTestRule
+            .onNodeWithText("OK")
+            .performClick()
+
+
+        composeTestRule.onNodeWithTag("eventTimeInput")
+            .performClick()
+
+        //Click on the "OK" button
+        composeTestRule
+            .onNodeWithText("OK")
+            .performClick()
+
+
+        composeTestRule
+            .onNodeWithText("Validate")
+            .performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 50000) {
+            composeTestRule
+                .onNodeWithContentDescription("Add an Event")
+                .isDisplayed()
+        }
+
+
+
+
+        composeTestRule.waitUntil(timeoutMillis = 50000) {
+            composeTestRule
+                .onAllNodesWithTag("eventItemTag")
+                .fetchSemanticsNodes().size > initialEventCount
+        }
+
+
         val newEventCount = composeTestRule
             .onAllNodesWithTag("eventItemTag")
             .fetchSemanticsNodes()

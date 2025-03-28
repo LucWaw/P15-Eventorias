@@ -13,18 +13,19 @@ import com.openclassrooms.eventorias.data.EventRepository
 import com.openclassrooms.eventorias.data.UserRepository
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Locale
+import java.util.concurrent.CountDownLatch
 
-class AddEventViewModel(private val eventRepository: EventRepository, val userRepository: UserRepository) : ViewModel() {
+class AddEventViewModel(
+    private val eventRepository: EventRepository,
+    val userRepository: UserRepository
+) : ViewModel() {
     /**
      * Internal mutable state flow representing the current event being edited.
      */
@@ -110,21 +111,20 @@ class AddEventViewModel(private val eventRepository: EventRepository, val userRe
         return userData.addOnSuccessListener { user ->
             _event.value = _event.value.copy(
                 author = user
-                )
-            viewModelScope.launch {
-                val pair = getLatitudeAndLongitudeFromAddressName(context, _event.value.eventLocation)
+            )
+            val pair = getLatitudeAndLongitudeFromAddressName(context, _event.value.eventLocation)
 
-                if (pair != null) {
-                    _event.value = _event.value.copy(
-                        latitude = pair.first,
-                        longitude = pair.second
-                    )
-                }
-                eventRepository.addEvent(
-                    _event.value,
-                    _uriImage.value
+            if (pair != null) {
+                _event.value = _event.value.copy(
+                    latitude = pair.first,
+                    longitude = pair.second
                 )
             }
+            eventRepository.addEvent(
+                _event.value,
+                _uriImage.value
+            )
+
 
         }.addOnFailureListener {
             Log.d("Screen AddEventViewModel", "Error: $it")
@@ -169,39 +169,38 @@ class AddEventViewModel(private val eventRepository: EventRepository, val userRe
      *
      * @OptIn(ExperimentalCoroutinesApi::class) Marks this function as using experimental coroutines features.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun getLatitudeAndLongitudeFromAddressName(
+    fun getLatitudeAndLongitudeFromAddressName(
         context: Context,
         address: String
     ): Pair<Double, Double>? {
         val geocoder = Geocoder(context, Locale.getDefault())
-        return suspendCancellableCoroutine { continuation ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                geocoder.getFromLocationName(
-                    address, 1,
-                    object : Geocoder.GeocodeListener {
-                        override fun onGeocode(addresses: MutableList<Address>) {
-                            if (addresses.isNotEmpty()) {
-                                val firstAddress = addresses[0]
-                                val latitude = firstAddress.latitude
-                                val longitude = firstAddress.longitude
-                                continuation.resume(
-                                    Pair(latitude, longitude),
-                                    onCancellation = null
-                                )
-                            } else {
-                                continuation.resume(null, onCancellation = null)
-                            }
-                        }
 
-                        override fun onError(errorMessage: String?) {
-                            super.onError(errorMessage)
-                            continuation.resume(null, onCancellation = null)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val latch = CountDownLatch(1)
+            var result: Pair<Double, Double>? = null
+
+            geocoder.getFromLocationName(
+                address, 1,
+                object : Geocoder.GeocodeListener {
+                    override fun onGeocode(addresses: MutableList<Address>) {
+                        if (addresses.isNotEmpty()) {
+                            val firstAddress = addresses[0]
+                            result = Pair(firstAddress.latitude, firstAddress.longitude)
                         }
-                    })
-            } else {
-                continuation.resume(null, onCancellation = null)
-            }
+                        latch.countDown() // Libère le thread bloqué
+                    }
+
+                    override fun onError(errorMessage: String?) {
+                        super.onError(errorMessage)
+                        latch.countDown() // Libère le thread bloqué en cas d'erreur
+                    }
+                })
+
+            latch.await() // Bloque le thread principal jusqu'à ce que `countDown()` soit appelé
+            return result
         }
+
+        return null
     }
+
 }

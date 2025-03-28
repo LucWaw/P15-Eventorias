@@ -21,7 +21,7 @@
     <string name="popup_message_recovery_account">Follow the instructions sent to address %1$s to recover your password.</string>
     <string name="logged_out">Logged out!</string>
     <string name="incorrect_password">Incorrect password</string>
-    <string name="add_a_event">Add a Event.</string>
+    <string name="add_an_event">Add an Event</string>
     <string name="event_List">Event list</string>
     <string name="search_an_item">Search through events</string>
     <string name="sort_event">Sort events by name or date</string>

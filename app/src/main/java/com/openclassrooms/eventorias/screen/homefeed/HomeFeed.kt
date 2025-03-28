@@ -50,8 +50,11 @@ import androidx.compose.ui.graphics.StrokeCap.Companion.Round
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -125,7 +128,7 @@ fun HomeFeedScreen(
                         ) {
                             Icon(
                                 Icons.Filled.Add,
-                                contentDescription = stringResource(R.string.add_a_event),
+                                contentDescription = stringResource(R.string.add_an_event),
                                 tint = Color.White
                             )
                         }
@@ -157,7 +160,7 @@ fun HomeFeedScreen(
             FloatingActionButton(
                 onClick = { onAddClick() },
             ) {
-                Icon(Icons.Filled.Add, stringResource(R.string.add_a_event))
+                Icon(Icons.Filled.Add, stringResource(R.string.add_an_event))
             }
         }
     ) { innerPadding ->
@@ -169,6 +172,8 @@ fun HomeFeedScreen(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
+                    // add a content description for screen readers
+                    modifier = Modifier.semantics { contentDescription = "Loading State" },
                     strokeWidth = 4.dp,
                     color = Color.White,
                     trackColor = GreyCircular,
@@ -204,11 +209,11 @@ private fun HomeFeed(
     onPostClick: (String) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier.padding(horizontal = 24.dp),
+        modifier = Modifier.testTag("LazyEvent").then(modifier.padding(horizontal = 24.dp)),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(items) { event ->
-            EventCell(event = event, onPostClick = onPostClick)
+            EventCell(event = event, onPostClick = onPostClick, modifier = Modifier.testTag("eventItemTag"))
         }
     }
 }
