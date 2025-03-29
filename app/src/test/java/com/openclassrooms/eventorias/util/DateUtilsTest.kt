@@ -8,7 +8,7 @@ import java.util.Locale
 
 class DateUtilsTest{
     @Test
-    fun test(){
+    fun `test toHumanDate with english locale and june date`(){
         // Given
         val date = LocalDate.of(2024, 6, 1)
         // When
@@ -18,7 +18,7 @@ class DateUtilsTest{
     }
 
     @Test
-    fun test2(){
+    fun `test toHumanDate with english locale and january date`(){
         // Given
         val date = LocalDate.of(2024, 1, 1)
         // When
@@ -28,7 +28,7 @@ class DateUtilsTest{
     }
 
     @Test
-    fun test3(){
+    fun `test toHumanDate with french locale and january date`(){
         // Given
         val date = LocalDate.of(2024, 1, 1)
         // When
@@ -38,7 +38,7 @@ class DateUtilsTest{
     }
 
     @Test
-    fun test4(){
+    fun `test toHumanDate with french locale and december date`(){
         // Given
         val date = LocalDate.of(2003,12,31)
         // When

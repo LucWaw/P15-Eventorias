@@ -9,7 +9,7 @@ import java.util.Locale
 class TimeUtilsTest {
 
     @Test
-    fun test() {
+    fun testToHumanTime_english_pm() {
         // Given
         val time = LocalTime.of(15, 6)
 
@@ -21,7 +21,7 @@ class TimeUtilsTest {
     }
 
     @Test
-    fun test2() {
+    fun testToHumanTime_english_pm2() {
         // Given
         val time = LocalTime.of(22, 6)
 
@@ -33,7 +33,7 @@ class TimeUtilsTest {
     }
 
     @Test
-    fun test3() {
+    fun testToHumanTime_english_am() {
         // Given
         val time = LocalTime.of(10, 0) // Assuming this is a time
 
@@ -45,7 +45,7 @@ class TimeUtilsTest {
     }
 
     @Test
-    fun test4() {
+    fun testToHumanTime_french_pm() {
          val time = LocalTime.of(22, 6)
 
         // When
@@ -56,7 +56,7 @@ class TimeUtilsTest {
     }
 
     @Test
-    fun test5() {
+    fun testToHumanTime_french_am() {
          val time = LocalTime.of(6, 6)
 
         // When
