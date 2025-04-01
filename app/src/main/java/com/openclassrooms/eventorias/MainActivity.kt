@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import com.openclassrooms.eventorias.screen.login.recoveraccountwithmail.Recover
 import com.openclassrooms.eventorias.screen.profile.ProfileScreen
 import com.openclassrooms.eventorias.ui.theme.BlackBackground
 import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
+import com.openclassrooms.eventorias.ui.theme.GreyLight
 import org.koin.compose.KoinContext
 
 class MainActivity : ComponentActivity() {
@@ -115,7 +117,11 @@ class MainActivity : ComponentActivity() {
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                unselectedIconColor = GreyLight,
+                                unselectedTextColor = GreyLight
+                            )
                         )
                     }
                 }
