@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -99,7 +100,7 @@ private fun LoginWithPassword(
             value = email,
             onValueChange = { onEmailChanged(it) },
             label = "E-mail",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag("emailInput")
         )
 
         if (error is FormError.EmailError) {
@@ -113,7 +114,7 @@ private fun LoginWithPassword(
             value = passwordLocal,
             onValueChange = { passwordLocal = it },
             label = stringResource(R.string.password),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag("passwordInput"),
         )
 
         Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
@@ -132,6 +133,7 @@ private fun LoginWithPassword(
                     Toast.makeText(context,
                         context.getString(R.string.incorrect_password), Toast.LENGTH_SHORT).show()
                 } },
+                modifier = Modifier.testTag("logInButton")
             )
 
         }

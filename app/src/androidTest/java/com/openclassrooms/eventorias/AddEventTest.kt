@@ -29,6 +29,45 @@ class AddEventTest : KoinTest {
     @Test
     fun testAddEvent() {
 
+        composeTestRule.waitUntil(timeoutMillis = 50000) {
+            composeTestRule
+                .onNodeWithText("Sign in with email")
+                .isDisplayed()
+        }
+
+        composeTestRule
+            .onNodeWithText("Sign in with email")
+            .performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 50000) {
+            composeTestRule
+                .onNodeWithText("Already have an account? Login")
+                .isDisplayed()
+        }
+
+        composeTestRule
+            .onNodeWithText("Already have an account? Login")
+            .performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 50000) {
+            composeTestRule
+                .onNodeWithText("Please enter your password.")
+                .isDisplayed()
+        }
+
+        composeTestRule
+            .onNodeWithTag("emailInput")
+            .performTextInput("fakehhkgugugugufugubkdt@mail.com")
+
+        composeTestRule
+            .onNodeWithTag("passwordInput")
+            .performTextInput("Gjgjgjvkfyfuvk")
+
+
+        composeTestRule
+            .onNodeWithTag("logInButton")
+            .performClick()
+
         // WAIT Loading
         composeTestRule.waitUntil(timeoutMillis = 50000) {
             composeTestRule

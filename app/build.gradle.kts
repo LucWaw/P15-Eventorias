@@ -1,3 +1,5 @@
+import com.android.build.gradle.BaseExtension
+import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -6,9 +8,60 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.crashlytics)
+    id("jacoco")
+    id("org.sonarqube") version "6.1.0.5360"
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "LucWaw_P15-Eventorias")
+        property("sonar.organization", "lucwaw")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
+
+tasks.withType<Test> {
+    extensions.configure(JacocoTaskExtension::class) {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
+val androidExtension = extensions.getByType<BaseExtension>()
+
+val jacocoTestReport by tasks.registering(JacocoReport::class) {
+    dependsOn("testDebugUnitTest", "createDebugCoverageReport")
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports"
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug")
+    val mainSrc = androidExtension.sourceSets.getByName("main").java.srcDirs
+
+    classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files(mainSrc))
+    executionData.setFrom(fileTree(buildDir) {
+        include("**/*.exec", "**/*.ec")
+    })
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
     namespace = "com.openclassrooms.eventorias"
     compileSdk = 35
 
@@ -48,6 +101,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
         }
     }
     compileOptions {
