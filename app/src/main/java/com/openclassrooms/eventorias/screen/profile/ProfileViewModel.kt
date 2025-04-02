@@ -147,9 +147,9 @@ class ProfileViewModel(val userRepository: UserRepository, application: Applicat
         }
     }
 
-    fun logout() {
-        userRepository.signOut()
-    }
+        fun logout() {
+            userRepository.signOut()
+        }
 
     fun deleteCurrentUser(): Task<Task<Void?>?> {
         return userRepository.deleteUser()

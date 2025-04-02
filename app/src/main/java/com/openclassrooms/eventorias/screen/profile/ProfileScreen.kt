@@ -221,7 +221,10 @@ fun ProfileScreen(
             Profile(
                 modifier = modifier.padding(contentPadding),
                 user = state.user,
-                onSignOut = { viewModel::logout; onSignOut() },
+                onSignOut = {
+                    viewModel.logout()
+                    onSignOut()
+                },
                 onDeleteAccount = {
                     openDeleteDialog(
                         viewModel::deleteCurrentUser,

@@ -142,7 +142,7 @@ class MainActivity : ComponentActivity() {
         Firebase.auth.addAuthStateListener { auth ->
             if (auth.currentUser == null) {
                 navHostController.navigate(Screen.Auth.route) {
-                    popUpTo(Screen.Home.route) { inclusive = true }
+                    popUpTo(Screen.Profile.route) { inclusive = true }
                 }
             }
         }
@@ -250,7 +250,7 @@ class MainActivity : ComponentActivity() {
                     onSignOut =
                         {
                             navHostController.navigate(Screen.Auth.route) {
-                                popUpTo(Screen.Home.route) {
+                                popUpTo(navHostController.graph.id) {
                                     inclusive = true
                                 }
                             }
