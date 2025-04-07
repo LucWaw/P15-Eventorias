@@ -40,7 +40,7 @@ jobs:
           echo $DATA > ./app/google-services.json
 
       - name: Run Gradle build
-        run: ./gradlew build
+        run: ./gradlew assembleDebug
         
       - name: Run gradle tests
         run: ./gradlew test
