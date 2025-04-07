@@ -57,7 +57,7 @@ jobs:
       - name: Putting data
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo $DATA > /home/runner/work/<Project-Name>/<Project-Name>/app/google-services.json
+        run: echo $DATA > ./app/google-services.json
 
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
