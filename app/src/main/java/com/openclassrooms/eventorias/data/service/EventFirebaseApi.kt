@@ -45,6 +45,11 @@ class EventFirebaseApi {
 
     }
 
+    fun deleteEvent(eventId: String) : Task<Void> {
+        Log.d("EventFirebaseApi", "deleteEvent: $eventId")
+        return getEventCollection().document(eventId).delete()
+    }
+
     fun getPost(eventId: String): Task<DocumentSnapshot> {
         return getEventCollection().document(eventId).get()
 

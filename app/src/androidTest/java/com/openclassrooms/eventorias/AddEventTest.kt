@@ -159,6 +159,21 @@ class AddEventTest : KoinTest {
                 .isDisplayed()
         }
 
+        composeTestRule
+            .onNodeWithText("Nouvel Événement")
+            .performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 50000) {
+            composeTestRule
+                .onNodeWithTag("deleteEvent")
+                .isDisplayed()
+        }
+
+        composeTestRule
+            .onNodeWithTag("deleteEvent")
+            .performClick()
+
+
 
     }
 }

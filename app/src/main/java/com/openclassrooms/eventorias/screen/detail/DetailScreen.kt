@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,9 +47,9 @@ import com.openclassrooms.eventorias.BuildConfig
 import com.openclassrooms.eventorias.R
 import com.openclassrooms.eventorias.domain.Event
 import com.openclassrooms.eventorias.domain.User
+import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import com.openclassrooms.eventorias.util.DateUtils.Companion.toHumanDate
 import com.openclassrooms.eventorias.util.TimeUtils.Companion.toHumanTime
-import com.openclassrooms.eventorias.ui.theme.EventoriasTheme
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
@@ -68,25 +70,40 @@ fun DetailScreen(
         contentWindowInsets = WindowInsets(0.dp),
         modifier = modifier,
         topBar =
-        {
-            TopAppBar(
-                windowInsets = WindowInsets(0.dp),
-                title = {
-                    Text(event.title)
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        onBackClick()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.contentDescription_go_back)
-                        )
+            {
+                TopAppBar(
+                    windowInsets = WindowInsets(0.dp),
+                    title = {
+                        Text(event.title)
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            onBackClick()
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(id = R.string.contentDescription_go_back)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = { viewModel.deleteEvent(eventId) },
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .testTag("deleteEvent")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
-                }
-            )
-        }
+                )
+            }
     ) { innerPadding ->
+
         Detail(event = event, modifier = Modifier.padding(innerPadding))
     }
 

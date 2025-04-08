@@ -21,4 +21,8 @@ class DetailViewModel(private val eventRepository: EventRepository) : ViewModel(
             Log.d("DetailViewModel", "Error getting event data", it)
         }
     }
+
+    fun deleteEvent(eventId: String): com.google.android.gms.tasks.Task<Void> {
+        return eventRepository.deleteEvent(eventId)
+    }
 }
