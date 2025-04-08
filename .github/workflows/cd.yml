@@ -15,12 +15,24 @@ jobs:
     - uses: actions/checkout@v4
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Decode Keystore
+      env:
+          ENCODED_STRING: ${{ secrets.KEYSTORE }}
+      run: |
+          TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
+          mkdir "${TMP_KEYSTORE_FILE_PATH}"
+          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/Eventorias_app_keystore_file.jks
     - name: build release 
       run: ./gradlew assembleRelease
+      env:
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
     - name: upload artifact to Firebase App Distribution
-      uses: wzieba/Firebase-Distribution-Github-Action@v1.5.1
+      uses: wzieba/Firebase-Distribution-Github-Action@v1.7.1
       with:
         appId: ${{secrets.FIREBASE_APP_ID}}
         serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
         groups: testers
         file: app/build/outputs/apk/release/app-release.apk
+    
