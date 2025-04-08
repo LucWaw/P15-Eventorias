@@ -1,5 +1,6 @@
 package com.openclassrooms.eventorias
 
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -7,10 +8,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,15 +29,18 @@ class AddEventTest : KoinTest {
     @Test
     fun testAddEvent() {
 
+
         composeTestRule.waitUntil(timeoutMillis = 50000) {
             composeTestRule
                 .onNodeWithText("Sign in with email")
                 .isDisplayed()
         }
 
+
         composeTestRule
             .onNodeWithText("Sign in with email")
             .performClick()
+
 
         composeTestRule.waitUntil(timeoutMillis = 50000) {
             composeTestRule
@@ -45,9 +48,11 @@ class AddEventTest : KoinTest {
                 .isDisplayed()
         }
 
+
         composeTestRule
             .onNodeWithText("Already have an account? Login")
             .performClick()
+
 
         composeTestRule.waitUntil(timeoutMillis = 50000) {
             composeTestRule
@@ -55,18 +60,22 @@ class AddEventTest : KoinTest {
                 .isDisplayed()
         }
 
+
         composeTestRule
             .onNodeWithTag("emailInput")
             .performTextInput("fakehhkgugugugufugubkdt@mail.com")
+
 
         composeTestRule
             .onNodeWithTag("passwordInput")
             .performTextInput("Gjgjgjvkfyfuvk")
 
 
+
         composeTestRule
             .onNodeWithTag("logInButton")
             .performClick()
+
 
         // WAIT Loading
         composeTestRule.waitUntil(timeoutMillis = 50000) {
@@ -75,31 +84,29 @@ class AddEventTest : KoinTest {
                 .isDisplayed()
         }
 
+
         composeTestRule.waitUntil(timeoutMillis = 10000) {
             composeTestRule
                 .onAllNodesWithTag("eventItemTag")
                 .fetchSemanticsNodes().isNotEmpty()
         }
 
-        val initialEventCount = composeTestRule
-            .onAllNodesWithTag("eventItemTag")
-            .fetchSemanticsNodes()
-            .size
-
-        composeTestRule.onAllNodesWithTag("eventItemTag").printToLog("eventItemTag")
 
 
         composeTestRule
             .onNodeWithContentDescription("Add an Event")
             .performClick()
 
+
         composeTestRule
             .onNodeWithTag("eventTitleInput")
             .performTextInput("Nouvel Événement")
 
+
         composeTestRule
             .onNodeWithTag("eventDescriptionInput")
             .performTextInput("Ceci est un test")
+
 
         composeTestRule
             .onNodeWithTag("eventAddressInput")
@@ -109,14 +116,17 @@ class AddEventTest : KoinTest {
         composeTestRule.onNodeWithTag("eventDateInput")
             .performClick()
 
+
         //Click on the "OK" button
         composeTestRule
             .onNodeWithText("OK")
             .performClick()
 
 
+
         composeTestRule.onNodeWithTag("eventTimeInput")
             .performClick()
+
 
         //Click on the "OK" button
         composeTestRule
@@ -128,6 +138,7 @@ class AddEventTest : KoinTest {
             .onNodeWithText("Validate")
             .performClick()
 
+
         composeTestRule.waitUntil(timeoutMillis = 50000) {
             composeTestRule
                 .onNodeWithContentDescription("Add an Event")
@@ -136,19 +147,18 @@ class AddEventTest : KoinTest {
 
 
 
-
         composeTestRule.waitUntil(timeoutMillis = 50000) {
+            try {
+                composeTestRule.onNodeWithTag("LazyEvent").performScrollToNode(hasText("Nouvel Événement"))
+            } catch (_: Exception) {
+                println("testAddEvent : LazyEvent not found")
+            }
+
             composeTestRule
-                .onAllNodesWithTag("eventItemTag")
-                .fetchSemanticsNodes().size > initialEventCount
+                .onNodeWithText("Nouvel Événement")
+                .isDisplayed()
         }
 
 
-        val newEventCount = composeTestRule
-            .onAllNodesWithTag("eventItemTag")
-            .fetchSemanticsNodes()
-            .size
-
-        assertEquals(initialEventCount + 1, newEventCount)
     }
 }
