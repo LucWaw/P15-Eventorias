@@ -29,7 +29,12 @@ tasks.withType<Test> {
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
-keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+try {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+} catch (_: Exception) {
+    //Do nothing
+    println("Keystore properties file not found")
+}
 
 val androidExtension = extensions.getByType<BaseExtension>()
 
@@ -56,10 +61,18 @@ val jacocoTestReport by tasks.registering(JacocoReport::class) {
 android {
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
+            val tmpFilePath = System.getProperty("user.home") + "/work/_temp/keystore/"
+            val allFilesFromDir = File(tmpFilePath).listFiles()
+
+            if (allFilesFromDir != null && allFilesFromDir.isNotEmpty()) {
+                val keystoreFile = allFilesFromDir.first()
+                keystoreFile.renameTo(File("keystore/Eventorias_app_keystore_file.jks"))
+            }
+
+            storeFile = File("keystore/Eventorias_app_keystore_file.jks")
+            storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+            keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
         }
     }
     namespace = "com.openclassrooms.eventorias"
@@ -76,20 +89,25 @@ android {
 
         val keystoreFile = project.rootProject.file("apikey.properties")
         val properties = Properties()
-        properties.load(keystoreFile.inputStream())
+        try {
+            properties.load(keystoreFile.inputStream())
+        } catch (_: Exception) {
+            //Do nothing
+            println("Keystore properties file not found")
+        }
 
         //return empty key in case something goes wrong
         val apiKey = properties.getProperty("WEB_ID") ?: ""
         buildConfigField(
             type = "String",
             name = "WEB_ID",
-            value = apiKey
+            value = "\"$apiKey\""
         )
         val mapsKey = properties.getProperty("MAPS_API_KEY") ?: ""
         buildConfigField(
             type = "String",
             name = "MAPS_API_KEY",
-            value = mapsKey
+            value = "\"$mapsKey\""
         )
     }
 
