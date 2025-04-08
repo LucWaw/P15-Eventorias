@@ -61,15 +61,7 @@ val jacocoTestReport by tasks.registering(JacocoReport::class) {
 android {
     signingConfigs {
         create("release") {
-            val tmpFilePath = System.getProperty("user.home") + "/work/_temp/keystore/"
-            val allFilesFromDir = File(tmpFilePath).listFiles()
-
-            if (allFilesFromDir != null && allFilesFromDir.isNotEmpty()) {
-                val keystoreFile = allFilesFromDir.first()
-                keystoreFile.renameTo(File("keystore/Eventorias_app_keystore_file.jks"))
-            }
-
-            storeFile = File("keystore/Eventorias_app_keystore_file.jks")
+            storeFile = file("keystore/Eventorias_app_keystore_file.jks")
             storePassword = System.getenv("SIGNING_STORE_PASSWORD")
             keyAlias = System.getenv("SIGNING_KEY_ALIAS")
             keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
