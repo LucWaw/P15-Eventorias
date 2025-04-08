@@ -26,6 +26,8 @@ jobs:
       run: |
         ls -lah ./app
         echo $DATA > ./app/google-services.json
+    - name: add keystore
+      run: touch ./app/keystore/Eventorias_app_keystore_file.jks && echo $KEYSTORE | base64 -d > ./app/keystore/Eventorias_app_keystore_file.jks
     - name: Decode Keystore
       env:
           ENCODED_STRING: ${{ secrets.KEYSTORE }}
