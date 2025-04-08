@@ -1,0 +1,26 @@
+name: Build & upload to Firebase App Distribution 
+
+on: 
+  push:
+    # Pattern matched against refs/tags
+    tags:        
+      - '**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: build release 
+      run: ./gradlew assembleRelease
+    - name: upload artifact to Firebase App Distribution
+      uses: wzieba/Firebase-Distribution-Github-Action@v1.5.1
+      with:
+        appId: ${{secrets.FIREBASE_APP_ID}}
+        serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+        groups: testers
+        file: app/build/outputs/apk/release/app-release.apk
