@@ -17,6 +17,8 @@ sonar {
         property("sonar.projectKey", "LucWaw_P15-Eventorias")
         property("sonar.organization", "lucwaw")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${rootProject.projectDir}/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
     }
 }
 
