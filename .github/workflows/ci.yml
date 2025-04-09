@@ -91,7 +91,7 @@ jobs:
       # Triggering SonarQube analysis as results of it are required by Quality Gate check.
       # Do it via gradle to keep coverage xml
       - name: SonarQube Scan
-        run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} --stacktrace
+        run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.scanner.skipJreProvisioning=true --stacktrace
 
       # Check the Quality Gate status.
       - name: SonarQube Quality Gate check
