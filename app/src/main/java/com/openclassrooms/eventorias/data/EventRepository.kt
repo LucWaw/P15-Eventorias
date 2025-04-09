@@ -46,13 +46,7 @@ class EventRepository(private val eventApi: EventFirebaseApi) {
 
 
     fun deleteEvent(eventId: String) : Task<Void> {
-        return eventApi.deleteEvent(eventId).addOnSuccessListener {
-            Log.d("EventRepository", "Event deleted successfully")
-        }.addOnFailureListener { exception ->
-            Log.e("EventRepository", "Error deleting event: ${exception.message}")
-        }.addOnCompleteListener {
-            Log.d("EventRepository", "Delete event task completed")
-        }
+        return eventApi.deleteEvent(eventId)
     }
 
     /**
