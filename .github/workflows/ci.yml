@@ -4,7 +4,9 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  
+  push:
+    branches:
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -106,11 +108,9 @@ jobs:
           script: ./gradlew jacocoTestReport
 
       # Triggering SonarQube analysis as results of it are required by Quality Gate check.
+      # Do it via gradle to keep coverage xml
       - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       # Check the Quality Gate status.
       - name: SonarQube Quality Gate check
