@@ -82,7 +82,11 @@ jobs:
           # Disabling shallow clone is recommended for improving relevancy of reporting.
           fetch-depth: 0
 
-      
+     
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+    
 
       # Triggering SonarQube analysis as results of it are required by Quality Gate check.
       # Do it via gradle to keep coverage xml
